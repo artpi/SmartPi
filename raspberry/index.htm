@@ -1,0 +1,135 @@
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+        <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+
+<script>
+
+var endPoint = "http://192.168.0.12/SH/SmartHome.php";
+
+
+function msg(command, alert) {
+    var co = command.join(" ");
+
+    if(alert.error === 0) {
+        var box = $('<div class="alert alert-success" role="alert"><b>'+co+'</b>: '+alert.msg+'</div>');
+        setTimeout(function() {
+            box.hide({done: function() {
+                box.remove();
+            }});
+        }, 5000);
+    } else {
+        var box = $('<div class="alert alert-danger" role="alert"><b>'+co+'</b>: <b>#'+alert.error+'</b> '+alert.msg+'</div>');
+        box.click(function() {
+            box.hide({done: function() {
+                box.remove();
+            }});
+        });
+    }
+    box.appendTo($('#msg'));
+
+}
+
+
+function getHTML(structure) {
+    var html='';
+
+    if(structure.commands) {
+
+        if(structure.trigger) {
+            html += '<h2>'+structure.trigger+'</h2> ';
+        }
+
+        html += '<div class="list-group" command="'+structure.trigger+'">';
+            for (var i = 0; i < structure.commands.length; i++) {
+                html += getHTML(structure.commands[i]);
+            }
+        html += "</div>";
+
+        console.log(html);
+        return html;
+
+    } else if (structure.trigger) {
+        return '<a href="#" class="list-group-item" command="'+structure.trigger+'">'+structure.trigger+'</a>'
+    } else {
+        return "";
+    }
+
+}
+
+$(document).ready(function() {
+    //$('#commands').html(getHTML(structure));
+
+    $.getJSON(endPoint, {
+            'action': 'getStructure'
+        }, function(data, status) {
+            $('#commands').html(getHTML(data));
+        });
+
+    $('#commands').click(function(ev) {
+        ev.preventDefault();
+        var element = ev.toElement;
+        var c;
+        var command = [];
+        while(element && element.id !== 'commands') {
+            c = element.getAttribute('command');
+            if(c && c!== 'undefined') {
+                command = [c].concat(command);
+            }
+            element = element.parentElement;
+        }
+        var arg = JSON.stringify(command);
+
+        $.getJSON(endPoint, {
+            'action': arg
+        }, function(data, status, xhr) {
+            //console.log('response', data, status, xhr);
+            msg(command, data);
+        });
+
+    });
+
+
+});
+
+</script>
+
+
+<style>
+
+body {margin:20px;}
+
+</style>
+
+    </head>
+    <body>
+<div id='menu'>
+<ul class="nav nav-pills">
+  <li role="presentation"><a href="http://192.168.0.12:6680/moped">Music Control</a></li>
+</ul>
+</div>
+
+
+
+<div id = 'msg'>
+</div>
+
+<div id='commands'>
+
+</div>
+
+
+</body>
+</html>
