@@ -1,5 +1,7 @@
 <?php
+chdir('/srv/SmartHome/www/');
 header('Access-Control-Allow-Origin: *');  
+include('config.php');
 
 class Command {
     public $triggers = array();
@@ -18,6 +20,7 @@ class Command {
     }
 
     function system($command) {
+        //echo $command."\n";
         exec($command, $ret, $status);
         $this->printSystem($ret);
         return $ret;
@@ -199,25 +202,56 @@ class MPCCommand extends Command {
 
 
 class MPCPlaylistCommand extends MPCCommand {
+    private $playlist;
     public $triggers = array(
             'line' => 'playlist'
         );
 
     function execute($args) {
+        if(isset($args[0])) {
+            $this->playlist = $args[0];
+        }
+
         $this->system("mpc clear");
-        $this->system("mpc load ".$args[0]);
+        $this->system("mpc load ".$this->playlist);
         $this->system("mpc random off");
         $this->system("mpc play");
         return $this->translateResponse($this->system("mpc status"));
     }
 
-    function __construct($comm = array()) {
+    function __construct($comm = array(), $p = '') {
+        $this->playlist = $p;
     }
 }
 
-class SmartHome extends MultipleCommand{
-    function __construct() {
 
+
+class SequenceCommand extends MultipleCommand {
+
+    function execute($arg = array(), $type = 'line') {
+        for ($i=0; $i < count($this->commands); $i++) { 
+            $this->commands[$i]->execute($arg, $type);
+        }
+    }
+
+
+    function getStructure($trigger) {
+        if(strlen($this->triggers[$trigger]) > 0 ) {
+            return array('trigger' => $this->triggers[$trigger]);
+        } else {
+            return false;
+        }
+    }
+
+}
+
+
+class SmartHome extends MultipleCommand{
+    private $states;
+    public $db;
+
+    function __construct() {
+        $this->db = new PDO(DB, DB_USER, DB_PASS);
     }
 
     function getJSON() {
@@ -237,10 +271,110 @@ class SmartHome extends MultipleCommand{
         $resp =  $this->execute($command, 'http');
         print(json_encode($resp, true));
     }
+
+    function registerTrigger($trigger) {
+        $trigger->db = $this->db;
+        $this->states[] = $trigger;
+    }
+
+
+    function checkTriggers() {
+        for ($i=0; $i < count($this->states); $i++) { 
+            $this->states[$i]->execute();
+        }
+    }
 }
 
 
+class Trigger {
+    public $db;
+}
+
+class StateTrigger extends Trigger {
+    protected $dbTable = 'SmartHome_states';
+    protected $key = '';
+    protected $state = '';
+
+
+    function execute() {
+        $this->load();
+        $result = $this->check();
+        if($result != $this->state) {
+            $this->changeState($this->state, $result);
+            $this->state = $result;
+            $this->save();
+        }
+    }
+
+    //Load state from sql
+    function load() {
+        $data = $this->db->query("SELECT value FROM `".$this->dbTable."` WHERE `key`='".$this->key."';")->fetch();
+        if(!isset($data['value'])) {
+            $this->db->exec("INSERT INTO `".$this->dbTable."` SET `key`='".$this->key."', value='".$this->state."';");
+        }
+        $this->state = $data['value'];
+    }
+
+    function save() {
+        $this->db->exec("UPDATE `".$this->dbTable."` SET value='".$this->state."', updated=CURRENT_TIMESTAMP() WHERE `key`='".$this->key."';");
+    }
+
+    function check() {
+        return 0;
+    }
+
+    function changeState($oldState, $newState) {
+
+    }
+
+}
+
+class BluetoothProximity extends StateTrigger {
+    private $address;
+    public $enterCommand = null;
+    public $leaveCommand = null;
+
+    function check() {
+        //hcitool name macaddress system command returns bd name of device if in proximity.
+        $command = "hcitool name ".$this->address;
+        exec($command, $ret, $status);
+        if(isset($ret[0])) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    }
+
+    function changeState($oldState, $newState) {
+        //entered in proximity
+        //print($newState);
+        if($oldState == 0 && $newState == 1 && $this->enterCommand) {
+            $this->enterCommand->execute();
+        } else if($oldState == 1 && $newState == 0 && $this->leaveCommand) {
+            //left proximity
+            $this->leaveCommand->execute();
+        }
+    }
+
+    function __construct($address, $key, $enter = null, $leave = null) {
+        $this->key=$key;
+        $this->address = $address;
+        $this->enterCommand = $enter;
+        $this->leaveCommand = $leave;
+    }
+}
+
+/*
+-------------------------------------------------------------
+*/
+
+
 $smart = new SmartHome();
+
+
+
+
 
 $sleepingRoom = new MultipleCommand(array(
         'line' => 'sleeping',
@@ -248,28 +382,51 @@ $sleepingRoom = new MultipleCommand(array(
         'http' => 'Sleeping Room Lamp'
     ));
 
-$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'off', 'voice' => 'of', 'http' => 'Off'), 2, 0, 0, 0));
-$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'on', 'voice' => 'on', 'http' => 'White'), 2, 100, 100, 100));
+
+$sleepingRoomOff = new RGBCommand(array('line' => 'off', 'voice' => 'of', 'http' => 'Off'), 2, 0, 0, 0);
+$sleepingRoom -> registerCommand($sleepingRoomOff);
+$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'on', 'voice' => 'on', 'http' => 'White'), 2, 255, 255, 255));
 $sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'green', 'voice' => 'green', 'http' => 'Green'), 2, 0, 100, 0));
-$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'blue', 'voice' => 'blue', 'http' => 'Blue'), 2, 0, 0, 100));
-$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'red', 'voice' => 'red', 'http' => 'Red'), 2, 100, 0, 0));
+$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'blue', 'voice' => 'blue', 'http' => 'Blue'), 2, 30, 120, 210));
+$sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'red', 'voice' => 'red', 'http' => 'Red'), 2, 252, 50, 30));
 $smart->registerCommand($sleepingRoom);
 
 
 $music = new MultipleCommand(array(
-        'line' => 'player',
+        'line'  => 'player',
         'voice' => 'player',
-        'http' => 'Big Player'
+        'http'  => 'Big Player'
     ));
 $music->registerCommand(new MPCCommand('play'));
-$music->registerCommand(new MPCCommand('pause'));
+$musicPlayerOff = new MPCCommand('pause');
+$music->registerCommand($musicPlayerOff);
 $music->registerCommand(new MPCCommand('stop'));
 $music->registerCommand(new MPCPlaylistCommand());
 $smart->registerCommand($music);
 
 $smart->registerCommand(new WakeCommand());
 
-if(isset($argv[1])) {
+
+
+$everythingOff = new SequenceCommand(array('line' => 'leave', 'voice' => 'leave', 'http' => 'Everything Off'));
+$everythingOff->registerCommand($musicPlayerOff);
+$everythingOff->registerCommand($sleepingRoomOff);
+
+
+$atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
+$atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
+
+
+
+$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
+$smart->registerTrigger($bluetoothProximity);
+$smart->registerCommand($everythingOff);
+
+
+if (isset($argv[1]) && $argv[1] == 'cron') {
+    $smart->checkTriggers();
+
+} else if(isset($argv[1])) {
 
     $arr = array_slice($argv, 1);
     $smart->execute($arr, 'line');
