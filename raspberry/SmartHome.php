@@ -339,8 +339,8 @@ class StateTrigger extends Trigger {
     function execute() {
         $this->load();
         $result = $this->check();
+        $result = $this->changeState($this->state, $result);
         if($result != $this->state) {
-            $this->changeState($this->state, $result);
             $this->state = $result;
             $this->save();
         }
@@ -364,7 +364,7 @@ class StateTrigger extends Trigger {
     }
 
     function changeState($oldState, $newState) {
-
+        return $newState;
     }
 
 }
@@ -388,12 +388,18 @@ class BluetoothProximity extends StateTrigger {
 
     function changeState($oldState, $newState) {
         //entered in proximity
-        //print($newState);
-        if($oldState == 0 && $newState == 1 && $this->enterCommand) {
+        //State is tries since last checking.
+        if($oldState > 5 && $newState == 1 && $this->enterCommand) {
             $this->enterCommand->execute();
-        } else if($oldState == 1 && $newState == 0 && $this->leaveCommand) {
+            return 0;
+        } else if($oldState == 5 && $newState == 0 && $this->leaveCommand) {
             //left proximity
             $this->leaveCommand->execute();
+            return 6;
+        } else if($newState == 0) {
+            return $oldState + 1;
+        } else if($newState == 1) {
+            return 0;
         }
     }
 
@@ -460,15 +466,13 @@ $everythingOff->registerCommand($musicPlayerOff);
 $everythingOff->registerCommand($sleepingRoomOff);
 
 
-//$atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
-//$atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
+//Comment these 5 lines if it wakes you up.
+$atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
+$atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
 
-
-
-//$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
-
-//$smart->registerTrigger($bluetoothProximity);
-//$smart->registerCommand($everythingOff);
+$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
+$smart->registerTrigger($bluetoothProximity);
+$smart->registerCommand($everythingOff);
 
 
 if (isset($argv[1]) && $argv[1] == 'cron') {
