@@ -1,5 +1,4 @@
 <?php
-chdir('/srv/SmartHome/www/');
 header('Access-Control-Allow-Origin: *');  
 include('config.php');
 
@@ -137,7 +136,7 @@ class I2Command extends Command {
 
     public function send($target, $a=0, $b=0, $c=0) {
         $concat = $target.",".$a.",".$b.",".$c.".";
-        $out="/srv/SmartHome/i2control ".$concat." 2>/dev/null";
+        $out="i2control ".$concat." 2>/dev/null";
         return $this->system($out);
     }
 
