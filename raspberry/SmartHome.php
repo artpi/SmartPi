@@ -3,6 +3,7 @@ chdir('/srv/SmartHome/www/');
 header('Access-Control-Allow-Origin: *');  
 include('config.php');
 
+
 class Command {
     public $triggers = array();
 
@@ -50,13 +51,13 @@ class WakeCommand extends Command {
     }
 
     function execute() {
-        (new RGBCommand(array(),1,$this->r(255),$this->r(142),$this->r(46)))->execute();
+        (new RGBCommand(array(),1,100,5,0))->execute();
         sleep(60 * 7);
-        (new RGBCommand(array(),1,$this->r(255),$this->r(212),$this->r(18)))->execute();
+        (new RGBCommand(array(),1,100,20,0))->execute();
+        sleep(60 * 7);
+        (new RGBCommand(array(),1,100,100,100))->execute();
         sleep(60 * 7);
         (new RGBCommand(array(),1,$this->r(252),$this->r(255),$this->r(171)))->execute();
-        sleep(60 * 7);
-        (new RGBCommand(array(),1,0,$this->r(0),$this->r(140),$this->r(250)))->execute();
         (new MPCPlaylistCommand())->execute(array("WakeUp"));
         sleep(60 * 19);
         (new RGBCommand(array(),1,0,0,0))->execute();
@@ -195,7 +196,13 @@ class MPCCommand extends Command {
         $this->comm = $comm;
     }
 
+
     function translateResponse($res) {
+        //Save position in DB in case we want to come back to that.
+        if(count($res) == 3 && preg_match('&\[(paused|playing)\]\s*#([0-9]+)/[0-9]+\s*([0-9:]+)/&is', $res[1], $result)) {
+            SmartHome::$db->exec("UPDATE `SmartHome_playlists` SET song = '".$res[0]."', playlistID = '".$result[2]."', pos = '".$result[3]."' WHERE current = 1;");
+        }
+
         return array("error" => 0, "msg" => $res[0].$res[1].$res[2]);
     }
 }
@@ -212,6 +219,8 @@ class MPCPlaylistCommand extends MPCCommand {
             $this->playlist = $args[0];
         }
 
+        $this->translateResponse($this->system("mpc status"));
+        SmartHome::$db->exec("UPDATE `SmartHome_playlists` SET current=0");
         $this->system("mpc clear");
         $this->system("mpc load ".$this->playlist);
         $this->system("mpc random off");
@@ -219,11 +228,44 @@ class MPCPlaylistCommand extends MPCCommand {
         return $this->translateResponse($this->system("mpc status"));
     }
 
-    function __construct($comm = array(), $p = '') {
+    function __construct($comm = false, $p = '') {
+        if($comm) {
+            $this->triggers = $comm;
+        }
         $this->playlist = $p;
     }
 }
 
+
+class MPCSavedPlaylistCommand extends MPCPlaylistCommand {
+
+    function execute($args) {
+        if(isset($args[0])) {
+            $this->playlist = $args[0];
+        }
+
+        $this->translateResponse($this->system("mpc status"));
+        $this->system("mpc clear");
+        $data = SmartHome::$db->query("SELECT * FROM `SmartHome_playlists` WHERE `key`='".$this->playlist."';")->fetch();
+        SmartHome::$db->exec("UPDATE `SmartHome_playlists` SET current =1 WHERE `key`='".$this->playlist."';");
+
+        $this->system($data['load']);
+        $this->system("mpc random off");
+        $this->system("mpc play ".$data['playlistID']);
+        //todo: gdzies tu jest blad.
+        sleep(4);
+        $res = $this->system("mpc seek ".$data['pos']);
+
+        return array("error" => 0, "msg" => $res[0].$res[1].$res[2]);
+    }
+
+    function __construct($comm = false, $p = '') {
+        if($comm) {
+            $this->triggers = $comm;
+        }
+        $this->playlist = $p;
+    }
+}
 
 
 class SequenceCommand extends MultipleCommand {
@@ -247,11 +289,11 @@ class SequenceCommand extends MultipleCommand {
 
 
 class SmartHome extends MultipleCommand{
+    public static $db;
     private $states;
-    public $db;
 
     function __construct() {
-        $this->db = new PDO(DB, DB_USER, DB_PASS);
+        self::$db = new PDO(DB, DB_USER, DB_PASS);
     }
 
     function getJSON() {
@@ -273,7 +315,7 @@ class SmartHome extends MultipleCommand{
     }
 
     function registerTrigger($trigger) {
-        $trigger->db = $this->db;
+        $trigger->db = self::$db;
         $this->states[] = $trigger;
     }
 
@@ -308,15 +350,15 @@ class StateTrigger extends Trigger {
 
     //Load state from sql
     function load() {
-        $data = $this->db->query("SELECT value FROM `".$this->dbTable."` WHERE `key`='".$this->key."';")->fetch();
+        $data = SmartHome::$db->query("SELECT value FROM `".$this->dbTable."` WHERE `key`='".$this->key."';")->fetch();
         if(!isset($data['value'])) {
-            $this->db->exec("INSERT INTO `".$this->dbTable."` SET `key`='".$this->key."', value='".$this->state."';");
+            SmartHome::$db->exec("INSERT INTO `".$this->dbTable."` SET `key`='".$this->key."', value='".$this->state."';");
         }
         $this->state = $data['value'];
     }
 
     function save() {
-        $this->db->exec("UPDATE `".$this->dbTable."` SET value='".$this->state."', updated=CURRENT_TIMESTAMP() WHERE `key`='".$this->key."';");
+        SmartHome::$db->exec("UPDATE `".$this->dbTable."` SET value='".$this->state."', updated=CURRENT_TIMESTAMP() WHERE `key`='".$this->key."';");
     }
 
     function check() {
@@ -372,10 +414,6 @@ class BluetoothProximity extends StateTrigger {
 
 $smart = new SmartHome();
 
-
-
-
-
 $sleepingRoom = new MultipleCommand(array(
         'line' => 'sleeping',
         'voice' => 'sleeping',
@@ -397,12 +435,23 @@ $music = new MultipleCommand(array(
         'voice' => 'player',
         'http'  => 'Big Player'
     ));
+$smart->registerCommand($music);
+
 $music->registerCommand(new MPCCommand('play'));
 $musicPlayerOff = new MPCCommand('pause');
 $music->registerCommand($musicPlayerOff);
-$music->registerCommand(new MPCCommand('stop'));
 $music->registerCommand(new MPCPlaylistCommand());
-$smart->registerCommand($music);
+
+$music->registerCommand(new MPCPlaylistCommand(array(
+        'http' => 'Play Workout',
+        'voice' => 'workout'
+    ), 'Workout'));
+
+$music->registerCommand(new MPCSavedPlaylistCommand(array(
+        'http' => 'Play TED',
+        'line' => 'TED'
+    ), 'TED'));
+
 
 $smart->registerCommand(new WakeCommand());
 
@@ -413,14 +462,15 @@ $everythingOff->registerCommand($musicPlayerOff);
 $everythingOff->registerCommand($sleepingRoomOff);
 
 
-$atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
-$atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
+//$atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
+//$atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
 
 
 
-$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
-$smart->registerTrigger($bluetoothProximity);
-$smart->registerCommand($everythingOff);
+//$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
+
+//$smart->registerTrigger($bluetoothProximity);
+//$smart->registerCommand($everythingOff);
 
 
 if (isset($argv[1]) && $argv[1] == 'cron') {
