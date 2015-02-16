@@ -1,6 +1,6 @@
 <?php
 header('Access-Control-Allow-Origin: *');  
-
+include('Utils.php');
 
 class Command {
     public $triggers = array();
@@ -323,6 +323,15 @@ class SmartHome extends MultipleCommand{
             $this->states[$i]->execute();
         }
     }
+
+    function calendar() {
+        $events = self::$db->query("SELECT * FROM `SmartHome_events` WHERE start<CURRENT_TIMESTAMP() AND exec IS NULL");
+        while ($event = $events->fetch()) { 
+            self::$db->query("UPDATE `SmartHome_events` SET exec=CURRENT_TIMESTAMP() WHERE id='".$event['id']."';");
+            $arr = explode(" ", $event['name']);
+            $this->execute($arr, 'line');
+        }
+    }
 }
 
 
@@ -476,7 +485,21 @@ $smart->registerCommand($everythingOff);
 
 
 if (isset($argv[1]) && $argv[1] == 'cron') {
+
+    //Download jobs from Google calendar
+    $g = new Calendar();
+    $g->auth(SmartHome::$db, 'calendar');
+    $events = $g->getEvents(CRON_CALENDAR, date("Y-m-d"), date("Y-m-d", time()+3*24*3600));
+    for ($i=0; $i < count($events); $i++) { 
+        if(!isset($events[$i]['description'])) {
+            $events[$i]['description'] = '';
+        }
+        SmartHome::$db->query("INSERT INTO SmartHome_events(id, start, end, name, args) VALUES('".$events[$i]['id']."','".$events[$i]['start']['dateTime']."','".$events[$i]['start']['dateTime']."','".$events[$i]['summary']."','".$events[$i]['description']."');");
+    }
+
     $smart->checkTriggers();
+    $smart->calendar();
+
 
 } else if(isset($argv[1])) {
 
