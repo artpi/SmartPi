@@ -379,7 +379,7 @@ class StateTrigger extends Trigger {
 }
 
 class BluetoothProximity extends StateTrigger {
-    private $address;
+    protected $address;
     public $enterCommand = null;
     public $leaveCommand = null;
 
@@ -418,6 +418,22 @@ class BluetoothProximity extends StateTrigger {
         $this->enterCommand = $enter;
         $this->leaveCommand = $leave;
     }
+}
+
+class IPProximity extends BluetoothProximity {
+
+    function check() {
+        //hcitool name macaddress system command returns bd name of device if in proximity.
+        $command = "ping -c 3 -q ".$this->address;
+        exec($command, $ret, $status);
+        if($status == 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    }
+
 }
 
 /*
@@ -479,9 +495,11 @@ $everythingOff->registerCommand($sleepingRoomOff);
 $atHome = new SequenceCommand(array('line' => 'enter', 'voice' => 'enter', 'http' => 'Enter Home'));
 $atHome->registerCommand(new MPCPlaylistCommand(array(), 'FinallyHome'));
 
-$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
-$smart->registerTrigger($bluetoothProximity);
+//$bluetoothProximity = new BluetoothProximity(BT_MAC, 'MotoGproximity', $atHome, $everythingOff);
+$ipProximity = new IPProximity(PHONE_IP, 'MotoGproximity', $atHome, $everythingOff);
+$smart->registerTrigger($ipProximity);
 $smart->registerCommand($everythingOff);
+
 
 
 if (isset($argv[1]) && $argv[1] == 'cron') {
@@ -494,6 +512,8 @@ if (isset($argv[1]) && $argv[1] == 'cron') {
         if(!isset($events[$i]['description'])) {
             $events[$i]['description'] = '';
         }
+        //I know, but i dont want to update
+        SmartHome::$db->query("DELETE FROM SmartHome_events WHERE id='".$events[$i]['id']."' AND exec IS NULL;");
         SmartHome::$db->query("INSERT INTO SmartHome_events(id, start, end, name, args) VALUES('".$events[$i]['id']."','".$events[$i]['start']['dateTime']."','".$events[$i]['start']['dateTime']."','".$events[$i]['summary']."','".$events[$i]['description']."');");
     }
 
