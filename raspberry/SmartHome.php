@@ -80,7 +80,8 @@ class MultipleCommand extends Command {
 
     function findCommand($command, $type) {
         for ($i=0; $i < count($this->commands); $i++) { 
-            if(isset($this->commands[$i]->triggers[$type]) && $this->commands[$i]->triggers[$type] == $command) {
+            if(isset($this->commands[$i]->triggers[$type]) && 
+                in_array($command, explode(",",$this->commands[$i]->triggers[$type]))) {
                 return $this->commands[$i];
             }
         }
@@ -185,6 +186,7 @@ class RGBCommand extends I2Command {
 class MPCCommand extends Command {
     private $comm;
     function execute($args = array()) {
+        $this->system("mpc volume 75");
         $this->system("mpc ".$this->comm);
         return $this->translateResponse($this->system("mpc status"));
     }
@@ -207,7 +209,8 @@ class MPCCommand extends Command {
 
 
 class MPCPlaylistCommand extends MPCCommand {
-    private $playlist;
+    protected $playlist;
+    protected $options = array();
     public $triggers = array(
             'line' => 'playlist'
         );
@@ -221,16 +224,23 @@ class MPCPlaylistCommand extends MPCCommand {
         SmartHome::$db->exec("UPDATE `SmartHome_playlists` SET current=0");
         $this->system("mpc clear");
         $this->system("mpc load ".$this->playlist);
-        $this->system("mpc random off");
+
+        if(in_array('random', $this->options)) {
+            $this->system("mpc random on");
+        } else {
+            $this->system("mpc random off");
+        }
+        
         $this->system("mpc play");
         return $this->translateResponse($this->system("mpc status"));
     }
 
-    function __construct($comm = false, $p = '') {
+    function __construct($comm = false, $p = '', $options = array()) {
         if($comm) {
             $this->triggers = $comm;
         }
         $this->playlist = $p;
+        $this->options = $options;
     }
 }
 
@@ -444,13 +454,13 @@ class IPProximity extends BluetoothProximity {
 $smart = new SmartHome();
 
 $sleepingRoom = new MultipleCommand(array(
-        'line' => 'sleeping',
-        'voice' => 'sleeping',
+        'line' => 'bedroom',
+        'voice' => 'bedroom',
         'http' => 'Sleeping Room Lamp'
     ));
 
 
-$sleepingRoomOff = new RGBCommand(array('line' => 'off', 'voice' => 'of', 'http' => 'Off'), 2, 0, 0, 0);
+$sleepingRoomOff = new RGBCommand(array('line' => 'off', 'voice' => 'of,off,love', 'http' => 'Off'), 2, 0, 0, 0);
 $sleepingRoom -> registerCommand($sleepingRoomOff);
 $sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'on', 'voice' => 'on', 'http' => 'White'), 2, 255, 255, 255));
 $sleepingRoom -> registerCommand(new RGBCommand(array('line' => 'green', 'voice' => 'green', 'http' => 'Green'), 2, 0, 100, 0));
@@ -473,8 +483,15 @@ $music->registerCommand(new MPCPlaylistCommand());
 
 $music->registerCommand(new MPCPlaylistCommand(array(
         'http' => 'Play Workout',
-        'voice' => 'workout'
-    ), 'Workout'));
+        'voice' => 'workout',
+        'line' => 'workout'
+    ), 'Workout', array('random')));
+
+$music->registerCommand(new MPCPlaylistCommand(array(
+        'http' => 'Play French',
+        'voice' => 'french',
+        'line' => 'french'
+    ), "'Playlist pour Picheque <3 by 1167115329'", array('random')));
 
 $music->registerCommand(new MPCSavedPlaylistCommand(array(
         'http' => 'Play TED',
@@ -528,8 +545,11 @@ if (isset($argv[1]) && $argv[1] == 'cron') {
 
 } else if(isset($_GET['voice'])) {
     
-    $argv = explode(',', $_GET['voice']);
-    $arr = array_slice($argv, 1);
+    $arr = explode(',', $_GET['voice']);
+    if($arr[0] == 'raspberry') {
+        $arr = array_slice($arr, 1);
+    }
+    
     $res = $smart->execute($arr, 'voice');
 
     if($res['error'] > 0) {
@@ -550,7 +570,6 @@ if (isset($argv[1]) && $argv[1] == 'cron') {
 } else {
 
 	print("-1");
-
 }
 
 
