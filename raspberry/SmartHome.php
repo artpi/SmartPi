@@ -191,8 +191,13 @@ class MPCCommand extends Command {
         return $this->translateResponse($this->system("mpc status"));
     }
 
-    function __construct($comm) {
-        $this->triggers = array('line' => $comm, 'voice' => $comm, 'http' => $comm);
+    function __construct($comm, $triggers = false) {
+        if(!$triggers) {
+            $this->triggers = array('line' => $comm, 'voice' => $comm, 'http' => $comm);
+        } else {
+            $this->triggers = $triggers;
+        }
+        
         $this->comm = $comm;
     }
 
@@ -477,7 +482,11 @@ $music = new MultipleCommand(array(
 $smart->registerCommand($music);
 
 $music->registerCommand(new MPCCommand('play'));
-$musicPlayerOff = new MPCCommand('pause');
+$musicPlayerOff = new MPCCommand('pause', array(
+        'http' => 'Stop',
+        'voice' => 'stop',
+        'line' => 'stop'
+    ));
 $music->registerCommand($musicPlayerOff);
 $music->registerCommand(new MPCPlaylistCommand());
 
