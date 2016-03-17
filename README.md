@@ -69,7 +69,7 @@ Any action can be triggered by voice command on my android phone. For example:
 - When I say "Player stop", player pauses playback. 
 
 This is achieved through **OK Google** voice command wired in *Google Now*. I have connected excellent **Tasker** (https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm) with **Autovoice** plugin (https://play.google.com/store/apps/details?id=com.joaomgcd.autovoice) to tap into power of voice commands.
-You can see my [Tasker configuration in android dir](android/Tasker/SmartPi.prj..xml)
+You can see my [Tasker configuration in android dir](android/Tasker/SmartPi.prj.xml)
 
 ##Code Setup
 
