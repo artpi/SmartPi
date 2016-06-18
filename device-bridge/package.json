@@ -1,0 +1,23 @@
+{
+  "name": "smartpi-device-bridge",
+  "version": "1.0.0",
+  "description": "Device Bridge for IOT setup",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "deep-freeze": "0.0.1",
+    "firebase": "^3.0.5",
+    "mqtt": "^1.11.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "6.0.4",
+    "eslint": "1.10.3",
+    "eslint-plugin-react": "3.11.3",
+    "eslint-plugin-wpcalypso": "1.1.3"
+  }
+}
