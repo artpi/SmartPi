@@ -1,7 +1,7 @@
-* Raspberry Smart Home (Smart Pi)
+# Raspberry Smart Home (Smart Pi)
 
 
-# Old version:
+## Old version:
 
 This project started as a PHP / Arduino setup. [I moved the old version to a an `master-old` branch](https://github.com/artpi/SmartPi/tree/master-old).
 These are some of the features of that version:
