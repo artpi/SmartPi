@@ -7,10 +7,11 @@ import TextField from 'material-ui/TextField';
 import firebase from 'firebase';
 import config from '../config-firebase';
 import get from 'lodash/get';
-firebase.initializeApp( config );
-window.f = firebase.database();
+import pick from 'lodash/pick';
 
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
+firebase.initializeApp( config );
+
+import { Card, CardActions, CardHeader, CardTitle, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 
 const styles = {
@@ -27,7 +28,11 @@ class NodemcuMinion extends Component {
 	}
 
 	submit() {
-		console.log( this.state );
+		this.props.dispatch( {
+			id: this.props.id,
+			action: 'set',
+			state: pick( this.state, [ 'red', 'green', 'blue' ] )
+		} );
 	}
 
 	render() {
@@ -50,11 +55,11 @@ class NodemcuMinion extends Component {
 
 				<CardText expandable={ true }>
 					<div>
-						<TextField floatingLabelText="RED" type={ 'number' } value={ get( this.props, [ 'state', 'red' ], '' ) } onChange = { ( e, val ) => this.setState( { 'red' : val } ) }/>
+						<TextField floatingLabelText="RED" type={ 'number' } value={ this.state.red || get( this.props, [ 'state', 'red' ], '' ) } onChange = { ( e, val ) => this.setState( { 'red' : val } ) }/>
 						<br />
-						<TextField floatingLabelText="GREEN" type={ 'number' } value={ get( this.props, [ 'state', 'green' ], '' ) } onChange = { ( e, val ) => this.setState( { 'green' : val } ) }/>
+						<TextField floatingLabelText="GREEN" type={ 'number' } value={ this.state.green || get( this.props, [ 'state', 'green' ], '' ) } onChange = { ( e, val ) => this.setState( { 'green' : val } ) }/>
 						<br />
-						<TextField floatingLabelText="BLUE" type={ 'number' } value={ get( this.props, [ 'state', 'blue' ], '' ) } onChange = { ( e, val ) => this.setState( { 'blue' : val } ) }/>
+						<TextField floatingLabelText="BLUE" type={ 'number' } value={ this.state.blue || get( this.props, [ 'state', 'blue' ], '' ) } onChange = { ( e, val ) => this.setState( { 'blue' : val } ) }/>
 						<br />
 					</div>
 				</CardText>
@@ -65,6 +70,10 @@ class NodemcuMinion extends Component {
 		);
 	}
 }
+
+function dispatch( action ) {
+	firebase.database().ref( 'dispatch' ).push( action );
+};
 
 class Main extends Component {
 	constructor( props, context ) {
@@ -105,6 +114,7 @@ class Main extends Component {
 						this.state.devices.map( device => ( <NodemcuMinion
 							key = { device.id }
 							id = { device.id }
+							dispatch = { dispatch }
 							name = { device.name }
 							online = { device.online }
 							state = { device.state }
