@@ -10,6 +10,7 @@ firebase.initializeApp( {
 	serviceAccount: './config-firebaseKeys.json',
 	databaseURL: config.firebase,
 } );
+var mainQueue = createMainWorker( firebase );
 
 client.on( 'connect', function() {
 	client.subscribe( 'iot/heartbeat' );
@@ -26,8 +27,6 @@ client.on( 'message', function( topic, message ) {
 		devices[ payload.id ].heartbeat( payload );
 	}
 } );
-
-var mainQueue = createMainWorker( firebase );
 
 process.on( 'SIGINT', function() {
 	console.log( 'Starting all queues shutdown' );

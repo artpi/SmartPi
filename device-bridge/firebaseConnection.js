@@ -41,6 +41,9 @@ module.exports.createMainWorker = function( firebase ) {
 			//Is the device online, does it exist?
 			if ( ! snapshot.exists() ) {
 				return reject( 'device does not exist' );
+			} else if ( snapshot.val().connected === false ) {
+				console.log( 'Omitting old requests assigned while offline' );
+				resolve();
 			} else {
 				resolve( Object.assign( data, {
 					_new_state: data.id.replace( '/', '_' ) + '_start'
