@@ -12,6 +12,7 @@
   "dependencies": {
     "deep-freeze": "0.0.1",
     "firebase": "^3.0.5",
+    "firebase-queue": "^1.4.0",
     "mqtt": "^1.11.2"
   },
   "devDependencies": {
