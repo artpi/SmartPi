@@ -2,3 +2,5 @@
 config*
 node_modules
 *.sublime-*
+.firebaserc
+web/build

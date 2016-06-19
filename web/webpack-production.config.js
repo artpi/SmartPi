@@ -18,7 +18,7 @@ const config = {
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         // suppresses warnings, usually from module minification
-        warnings: false,
+        warnings: true,
       },
     }),
     // Allows error warnings but does not stop compiling.
@@ -31,9 +31,9 @@ const config = {
   module: {
     loaders: [
       {
-        test: /\.js$/, // All .js files
-        loaders: ['babel-loader'], // react-hot is like browser sync and babel loads jsx and es6-7
-        exclude: [nodeModulesPath],
+        test: /\.js$/,
+        loader: ['babel-loader'],
+        exclude: nodeModulesPath,
         query: {
           presets: ['es2015', 'react']
         }
