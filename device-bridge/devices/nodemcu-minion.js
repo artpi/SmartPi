@@ -3,7 +3,10 @@ var isEqual = require( 'lodash/isEqual' );
 
 function NodemcuMinion( id ) {
 	this.id = id;
+    this.type = 'nodemcu-minion';
 	this.firebase = null;
+	this.firebaseRoot = null;
+	this.queue = null;
 	this.state = {};
 	this.disconnectTimeout = null;
 	this.connected = false;
@@ -15,6 +18,7 @@ NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
 	}
 	if ( ! this.connected ) {
 		this.connected = true;
+		this.connectQueue();
 		this.firebase.child( 'connected' ).set( this.connected );
 	}
 	clearTimeout( this.disconnectTimeout );
@@ -23,13 +27,22 @@ NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
 
 NodemcuMinion.prototype.disconnect = function() {
 	this.connected = false;
-	this.firebase.child( 'connected' ).set( this.connected );
+	return Promise.all( [
+		this.firebase.child( 'connected' ).set( this.connected ),
+		this.queue.shutdown()
+	] );
+};
+
+NodemcuMinion.prototype.connectQueue = function() {
+	this.queue = createGatewayWorker( this.firebaseRoot, this.id, this.processQueueTask.bind( this ) );
 };
 
 NodemcuMinion.prototype.connect = function( firebase, mqtt ) {
+	this.firebaseRoot = firebase;
 	this.firebase = firebase.database().ref( 'things/' + this.id );
+    this.firebase.child( 'type' ).set( this.type );
 	this.client = mqtt;
-	createGatewayWorker( firebase, this.id, this.processQueueTask.bind( this ) );
+	this.connectQueue();
 };
 
 NodemcuMinion.prototype.forwardToDevice = function( data ) {

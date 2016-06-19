@@ -21,7 +21,7 @@ module.exports.createGatewayWorker = function ( firebase, gatewayKey, processFun
 			} );
 		}
 	} );
-	new Queue(
+	return new Queue(
 		getQueueRef( firebase ),
 		{ specId: gatewayKey },
 		processFunction
@@ -29,7 +29,7 @@ module.exports.createGatewayWorker = function ( firebase, gatewayKey, processFun
 };
 
 module.exports.createMainWorker = function( firebase ) {
-	new Queue( getQueueRef( firebase ), function( data, progress, resolve, reject ) {
+	return new Queue( getQueueRef( firebase ), function( data, progress, resolve, reject ) {
 		if ( ! data.id || ! data.action ) {
 			//Malformed request
 			//Resolve without doing anything - maybe log ?

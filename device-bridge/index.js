@@ -27,4 +27,17 @@ client.on( 'message', function( topic, message ) {
 	}
 } );
 
-createMainWorker( firebase );
+var mainQueue = createMainWorker( firebase );
+
+process.on( 'SIGINT', function() {
+	console.log( 'Starting all queues shutdown' );
+	var queues = [ mainQueue.shutdown() ];
+	for ( var id in devices ) {
+		queues.push( devices[ id ].disconnect() );
+	}
+	Promise.all( queues )
+	.then( function() {
+		console.log( 'Finished queue shutdown' );
+		process.exit( 0 );
+	} );
+} );
