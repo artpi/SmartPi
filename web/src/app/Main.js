@@ -37,7 +37,6 @@ class Main extends Component {
 	}
 
 	render() {
-		console.log( this.props.user );
 		return (
 			<MuiThemeProvider muiTheme={ getMuiTheme() }>
 				<div style={styles.container}>

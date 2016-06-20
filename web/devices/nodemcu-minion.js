@@ -22,6 +22,13 @@ class NodemcuMinion extends Component {
 		} );
 	}
 
+	off() {
+		this.props.dispatch( {
+			id: this.props.id,
+			action: 'off'
+		} );
+	}
+
 	render() {
 		return (
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
@@ -52,6 +59,7 @@ class NodemcuMinion extends Component {
 				</CardText>
 				<CardActions expandable={ true }>
 					<FlatButton label="SAVE" onClick={ () => { this.submit() } } />
+					<FlatButton label="OFF" onClick={ () => { this.off() } } />
 				</CardActions>
 			</Card>
 		);

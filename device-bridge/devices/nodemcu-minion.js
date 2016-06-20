@@ -50,10 +50,25 @@ NodemcuMinion.prototype.forwardToDevice = function( data ) {
 	this.client.publish( topic, JSON.stringify( data ) );
 };
 
+NodemcuMinion.prototype.off = function() {
+	var topic = 'iot/things/' + this.id.split( '/' )[ 1 ]; //Remove gateway reference and substitute with iot/things
+	this.client.publish( topic, JSON.stringify( {
+		action: 'set',
+		state: {
+			red: 0,
+			green: 0,
+			blue: 0
+		}
+	} ) );
+};
+
 NodemcuMinion.prototype.processQueueTask = function( data, progress, resolve, reject ) {
 	//to replace later
 	if ( data.action === 'set' ) {
 		this.forwardToDevice( data );
+		resolve();
+	} else 	if ( data.action === 'off' ) {
+		this.off();
 		resolve();
 	} else {
 		reject( 'Unknown command' );
