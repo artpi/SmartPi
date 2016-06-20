@@ -1,10 +1,10 @@
-var config = require( './config.js' );
-var mqtt = require( 'mqtt' );
-var client = mqtt.connect( config.broker );
-var firebase = require( 'firebase' );
-var devices = {};
-var NodemcuMinion = require( './devices/nodemcu-minion.js' );
-var createMainWorker = require( './firebaseConnection.js' ).createMainWorker;
+import config from './config.js';
+import mqtt from 'mqtt';
+const client = mqtt.connect( config.broker );
+import firebase from 'firebase';
+const devices = {};
+import NodemcuMinion from './devices/nodemcu-minion.js';
+import { createMainWorker } from './firebaseConnection.js';
 
 firebase.initializeApp( {
 	serviceAccount: './config-firebaseKeys.json',

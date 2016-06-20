@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "babel-node ./index.js --preset es2015-node"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015-node": "^6.1.0",
     "firebase": "^3.0.5",
     "firebase-queue": "^1.4.0",
     "lodash": "^4.13.1",
