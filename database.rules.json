@@ -2,7 +2,7 @@
   "dispatch": {
   	".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
   	"$action": { 
-  		".write": "newData.child('token').val() === root.child('spec').child('apiToken').val() || root.child('spec').child('users').child( auth.uid ).val() === true"
+  		".write": "newData.child('token').val() === root.child('triggers').child( newData.child('triggerName').val() ).child('token').val() || root.child('spec').child('users').child( auth.uid ).val() === true"
   	},
 	".indexOn": "_state"
    },

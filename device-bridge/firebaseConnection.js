@@ -30,25 +30,42 @@ module.exports.createGatewayWorker = function ( firebase, gatewayKey, processFun
 
 module.exports.createMainWorker = function( firebase ) {
 	return new Queue( getQueueRef( firebase ), function( data, progress, resolve, reject ) {
-		if ( ! data.id || ! data.action ) {
-			//Malformed request
-			//Resolve without doing anything - maybe log ?
+		if ( data.action && data.id ) {
+			firebase.database().ref( 'things/' + data.id ).once( 'value' )
+			.then( function( snapshot ) {
+				//Is the device online, does it exist?
+				if ( ! snapshot.exists() ) {
+					return reject( 'device does not exist' );
+				} else if ( snapshot.val().connected === false ) {
+					console.log( 'Omitting old requests assigned while offline' );
+					resolve();
+				} else {
+					resolve( Object.assign( data, {
+						_new_state: data.id.replace( '/', '_' ) + '_start'
+					} ) );
+				}
+			} );
+		} else if ( data.triggerName ) {
+			console.log( 'trigger', data );
+			firebase.database().ref( 'triggers/' + data.triggerName + '/actions' ).once( 'value' )
+			.then( function( actions ) {
+				if ( ! actions.exists() ) {
+					console.log( 'trigger does not exist' );
+					return reject( 'trigger does not exist' );
+				} else {
+					var newActions = [];
+					actions.forEach( function( action ) {
+						console.log( 'trigger', data, action.val() );
+						newActions.push( firebase.database().ref( 'dispatch' ).push(
+							Object.assign( {}, action.val() )
+						) );
+					} );
+					Promise.all( newActions ).then( resolve );
+				}
+			} );
+		} else {
+			console.log( 'unknown command', data );
 			return resolve();
 		}
-
-		firebase.database().ref( 'things/' + data.id ).once( 'value' )
-		.then( function( snapshot ) {
-			//Is the device online, does it exist?
-			if ( ! snapshot.exists() ) {
-				return reject( 'device does not exist' );
-			} else if ( snapshot.val().connected === false ) {
-				console.log( 'Omitting old requests assigned while offline' );
-				resolve();
-			} else {
-				resolve( Object.assign( data, {
-					_new_state: data.id.replace( '/', '_' ) + '_start'
-				} ) );
-			}
-		} );
 	} );
 };
