@@ -1,4 +1,4 @@
 {
-  ".read": true,
-  ".write": true
+  ".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
+  ".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
 }
