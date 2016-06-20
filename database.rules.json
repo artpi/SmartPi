@@ -1,4 +1,17 @@
 {
-  ".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
-  ".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
+  "dispatch": {
+  	".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
+  	"$action": { 
+  		".write": "newData.child('token').val() === root.child('spec').child('apiToken').val() || root.child('spec').child('users').child( auth.uid ).val() === true"
+  	},
+	".indexOn": "_state"
+   },
+  "spec": {
+  	".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
+  	".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
+  },
+  "things": {
+  	".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
+  	".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
+  }
 }
