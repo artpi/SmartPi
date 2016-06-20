@@ -39,7 +39,7 @@ class NodemcuMinion extends Component {
 		return (
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
 				<CardHeader
-					title={ this.props.id }
+					title={ this.props.name || this.props.id }
 					subtitle={ "Nodemcu Minion" }
 					actAsExpander={ true }
 					showExpandableButton={ true }
