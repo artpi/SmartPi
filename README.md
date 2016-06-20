@@ -82,6 +82,7 @@ Making a request:
 curl -X POST -d '{"triggerName":...,"token":..}' https://<your-project>.firebaseio.com/dispatch.json
 ```
 with a proper token will put a new task in `dispatch` queue that will be picked up by device gateway general worker. Each trigger has its own token.
+This feature is used for IFTTT integration
 
 #### Web App
 
