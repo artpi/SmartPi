@@ -55,10 +55,9 @@ module.exports.createMainWorker = function( firebase ) {
 				} else {
 					var newActions = [];
 					actions.forEach( function( action ) {
-						console.log( 'trigger', data, action.val() );
-						newActions.push( firebase.database().ref( 'dispatch' ).push(
-							Object.assign( {}, action.val() )
-						) );
+						var newAction = Object.assign( {}, action.val(), data.action );
+						console.log( 'queuing new action', newAction );
+						newActions.push( firebase.database().ref( 'dispatch' ).push( newAction ) );
 					} );
 					Promise.all( newActions ).then( resolve );
 				}
