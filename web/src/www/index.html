@@ -2,9 +2,13 @@
 <html class="no-js" lang="">
 
 <head>
+	<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/ui/0.4.0/firebase-ui-auth.js"></script>
+	<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/0.4.0/firebase-ui-auth.css" />
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Material-UI Example</title>
+	<title>Artpi Smart Home</title>
 	<meta name="description" content="Super Smart Home!.">
 
 	<!-- Use minimum-scale=1 to enable GPU rasterization -->
@@ -16,6 +20,10 @@
 </head>
 
 <body>
+	<div id="logged-out">
+		<h1>Artpi super Smart Home</h1>
+		<div id="firebaseui-auth-container"></div>
+	</div>
 	<div id="app"></div>
 	<script>
 		var WebFontConfig = {
