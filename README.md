@@ -6,9 +6,13 @@
 - Wireless control over $4 ESP8266 modules
 - AC/DC current control
 - RGB LED strip control, Sunrise simulation
-- IFTTT integration, you can trigger individual tasks or sequences from your calendar, twitter, etc.
+- IFTTT integration
+	- Presence sensing
+	- Google Calendar intogration
+	- Notifications
 - Device shadows (keeping last device state), notification on device disconnection (ex. when power fails)
 - Google / Facebok / Github... etc login and auth
+- Triggers that can start a series of tasks
 - Websocket API
 - REST API
 - React / Firebase web app
@@ -22,7 +26,7 @@ TBD
 
 This whole project started as a quest to build self-owned IOT cloud with minimal setup and enabling running as cheap as possible.
 There are plenty solutions on the market. Some of them looked like they can disappear any minute, some of them were not cheap.
-Amazon IOT was very temting, but I couldn't run it for free and the cheapest modules had trouble connecting to their SSL servers (because of TLS 1.2)
+Amazon IOT was very tempting, but I couldn't run it for free and the cheapest modules had trouble connecting to their SSL servers (because of TLS 1.2)
 
 All in all, I settled on Firebase, which is real-time cloud json database from Google. With Firebase you have Hosting, Google / Facebook / Github... 
 authentication and authorization.
@@ -52,15 +56,40 @@ Theoretically devices could connect to Firebase directly, but I wanted to limit 
 #### Device Gateway
 
 This is the only element that stops the whole system from working, because this is the only piece that runs actual code.
-
+Device Gateway handles Firebase Queues and MQTT messages and it is a Node Script.
+- it updates device shadow state in Firebase by parsing heartbeat messages
+- keeps "General" queue
+	- to dispatch task to a proper device queue
+	- to generate a task series upon a trigger
+- keeps queue for every device to change its state
 
 #### Firebase
 
-TBD
+Firebase database is a heart of whole setup.
+- `dispatch` tree is used as a task queue
+- `devices` tree is used as a device shadow tree
+- `spec` tree holds queue configuration details and user authorization rules
+- `triggers` tree holds information about triggered task series.
+
+Firebase hosting hosts a web app
+Firebase Authentication is used for logging
+
+##### Triggers
+
+Via smart configuration of Firebase access rules, triggers expose HTTPS endpoint that does not require login.
+Making a request:
+```
+curl -X POST -d '{"triggerName":...,"token":..}' https://<your-project>.firebaseio.com/dispatch.json
+```
+with a proper token will put a new task in `dispatch` queue that will be picked up by device gateway general worker. Each trigger has its own token.
 
 #### Web App
 
-TBD
+Firebase-React web app:
+- implements Google account login via Firebase Auth
+- displays device state
+- is used for dispatching state changes
+- is used for configuration
 
 ## Old version (SmartPi):
 
