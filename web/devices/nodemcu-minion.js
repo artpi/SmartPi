@@ -16,10 +16,18 @@ class NodemcuMinion extends Component {
 	}
 
 	submit() {
+        var red = Math.round(this.state.red * 1); 
+        var green = Math.round(this.state.green * 1); 
+        var blue = Math.round(this.state.blue * 1);
+        
 		this.props.dispatch( {
 			id: this.props.id,
 			action: 'set',
-			state: pick( this.state, [ 'red', 'green', 'blue' ] )
+			state: {
+                red: red,
+                green: green,
+                blue: blue
+            }
 		} );
 	}
 
