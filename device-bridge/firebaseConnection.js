@@ -1,14 +1,12 @@
-var Queue = require( 'firebase-queue' );
+import Queue from 'firebase-queue';
 
 function getQueueRef( firebase ) {
 	return { tasksRef: firebase.database().ref( 'dispatch' ), specsRef: firebase.database().ref( 'spec/queue' ) };
 }
 
-module.exports = {};
-
-module.exports.createGatewayWorker = function ( firebase, gatewayKey, processFunction ) {
+export function createGatewayWorker( firebase, gatewayKey, processFunction ) {
 	gatewayKey = gatewayKey.replace( '/', '_' );
-	var specRef = firebase.database().ref( 'spec/queue/' ).child( gatewayKey );
+	const specRef = firebase.database().ref( 'spec/queue/' ).child( gatewayKey );
 	specRef.once( 'value' ).then( function( snapshot ) {
 		if ( ! snapshot.val() ) {
 			specRef.set( {
@@ -26,9 +24,9 @@ module.exports.createGatewayWorker = function ( firebase, gatewayKey, processFun
 		{ specId: gatewayKey },
 		processFunction
 	);
-};
+}
 
-module.exports.createMainWorker = function( firebase ) {
+export function createMainWorker( firebase ) {
 	return new Queue( getQueueRef( firebase ), function( data, progress, resolve, reject ) {
 		if ( data.action && data.id ) {
 			firebase.database().ref( 'things/' + data.id ).once( 'value' )
@@ -53,7 +51,7 @@ module.exports.createMainWorker = function( firebase ) {
 					console.log( 'trigger does not exist' );
 					return reject( 'trigger does not exist' );
 				} else {
-					var newActions = [];
+					const newActions = [];
 					actions.forEach( function( action ) {
 						var newAction = Object.assign( {}, action.val(), data.action );
 						console.log( 'queuing new action', newAction );
@@ -67,4 +65,4 @@ module.exports.createMainWorker = function( firebase ) {
 			return resolve();
 		}
 	} );
-};
+}

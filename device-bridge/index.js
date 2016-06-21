@@ -1,16 +1,19 @@
-import config from './config.js';
 import mqtt from 'mqtt';
-const client = mqtt.connect( config.broker );
 import firebase from 'firebase';
-const devices = {};
+
+import config from './config.js';
 import NodemcuMinion from './devices/nodemcu-minion.js';
 import { createMainWorker } from './firebaseConnection.js';
+
+const client = mqtt.connect( config.broker );
+const devices = {};
 
 firebase.initializeApp( {
 	serviceAccount: './config-firebaseKeys.json',
 	databaseURL: config.firebase,
 } );
-var mainQueue = createMainWorker( firebase );
+
+const mainQueue = createMainWorker( firebase );
 
 client.on( 'connect', function() {
 	client.subscribe( 'iot/heartbeat' );
@@ -18,7 +21,7 @@ client.on( 'connect', function() {
 
 client.on( 'message', function( topic, message ) {
 	if ( topic === 'iot/heartbeat' ) {
-		var payload = JSON.parse( message.toString() );
+		const payload = JSON.parse( message.toString() );
 
 		if ( ! devices[ payload.id ] ) {
 			devices[ payload.id ] = new NodemcuMinion( config.id + '/' + payload.id );
@@ -30,8 +33,8 @@ client.on( 'message', function( topic, message ) {
 
 process.on( 'SIGINT', function() {
 	console.log( 'Starting all queues shutdown' );
-	var queues = [ mainQueue.shutdown() ];
-	for ( var id in devices ) {
+	const queues = [ mainQueue.shutdown() ];
+	for ( let id in devices ) {
 		queues.push( devices[ id ].disconnect() );
 	}
 	Promise.all( queues )

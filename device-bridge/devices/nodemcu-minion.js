@@ -1,5 +1,5 @@
-var createGatewayWorker = require( '../firebaseConnection.js' ).createGatewayWorker;
-var isEqual = require( 'lodash/isEqual' );
+import { createGatewayWorker } from '../firebaseConnection.js' ;
+import isEqual from 'lodash/isEqual';
 
 function NodemcuMinion( id ) {
 	this.id = id;
