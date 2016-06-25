@@ -49,6 +49,10 @@ class NodemcuMinion extends Component {
 		} );
 	}
 
+	getTitle() {
+		return ( this.props.name || this.props.id );
+	}
+
 	render() {
 		return (
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
@@ -57,7 +61,7 @@ class NodemcuMinion extends Component {
 					showExpandableButton={ true }
 				>
 				<div style={ { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '20px', marginRight: '50px' } }>
-					<b>{ this.props.name || this.props.id }</b>
+					<b>{ this.getTitle() }</b>
 					<div style={ { display: 'flex', flexDirection: 'row' } }>
 						{ some( Object.keys( this.props.state ), key => !! this.props.state[ key ] ) && this.props.online
 							? <Chip style={ styles.chip } backgroundColor={ cyan200 } onRequestDelete={ this.off.bind( this ) } onTouchTap={ this.off.bind( this ) }>ON</Chip>
@@ -67,8 +71,9 @@ class NodemcuMinion extends Component {
 						: null }
 						<Snackbar
 							open={ this.state.fetching }
-							message="Requesting change"
-							autoHideDuration={ 3000 }
+							message={ this.getTitle() + ' Requesting change' }
+							autoHideDuration={ 5000 }
+							onRequestClose={ () => this.setState( { fetching: false } ) }
 						/>
 					</div>
 				</div>
