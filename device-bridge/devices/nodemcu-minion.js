@@ -1,9 +1,12 @@
 import { createGatewayWorker } from '../firebaseConnection.js' ;
 import isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
+
 
 function NodemcuMinion( id ) {
 	this.id = id;
     this.type = 'nodemcu-minion';
+    this.mode = 'rgb';
 	this.firebase = null;
 	this.firebaseRoot = null;
 	this.queue = null;
@@ -13,6 +16,11 @@ function NodemcuMinion( id ) {
 }
 
 NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
+	if ( get( heartbeat, 'config.mode', this.mode ) !== this.mode ) {
+		this.mode = get( heartbeat, 'config.mode', this.mode );
+		this.firebase.child( 'mode' ).set( this.mode );
+	}
+
 	if ( ! isEqual( heartbeat.state, this.state ) ) {
 		this.firebase.child( 'state' ).set( heartbeat.state );
 	}
@@ -57,7 +65,8 @@ NodemcuMinion.prototype.off = function() {
 		state: {
 			red: 0,
 			green: 0,
-			blue: 0
+			blue: 0,
+			power: 0
 		}
 	} ) );
 };
