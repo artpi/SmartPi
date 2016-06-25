@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
-import NodemcuMinion from '../../devices/nodemcu-minion';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
+import Devices from './Devices.js';
 
 const styles = {
 	container: {
@@ -15,42 +15,22 @@ class Main extends Component {
 	constructor( props, context ) {
 		super( props, context );
 		this.state = {
-			devices: [],
 			drawer: false
 		};
 	}
 
-	componentDidMount() {
-		this.props.db.ref( 'things' ).on( 'value', gateways => {
-			const devices = [];
-			gateways = gateways.val();
-			for ( let gateway in gateways ) {
-				for ( let device in gateways[ gateway ] ) {
-					let data = gateways[ gateway ][ device ] || {};
-					devices.push( {
-						id: gateway + '/' + device,
-						online: data.connected,
-						mode: data.mode,
-						name: data.name || data.id,
-						state: data.state
-					} );
-				}
-			}
-			this.setState( { devices } );
-		} );
-	}
 	handleDrawer() {
-		this.setState({drawer: !this.state.drawer})
+		this.setState( { drawer: !this.state.drawer } );
 	}
 
 
 	render() {
 		return (
 			<MuiThemeProvider muiTheme={ getMuiTheme() }>
-				<div style={styles.container}>
+				<div style={ styles.container }>
 					<Drawer
 						docked={ false }
-						open={this.state.drawer}
+						open={ this.state.drawer }
 						onRequestChange={ this.handleDrawer.bind( this ) }
 					>
 						<MenuItem>Menu Item</MenuItem>
@@ -61,17 +41,7 @@ class Main extends Component {
 						iconClassNameRight="muidocs-icon-navigation-expand-more"
 						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>
-					{
-						this.state.devices.map( device => ( <NodemcuMinion
-							key = { device.id }
-							id = { device.id }
-							dispatch = { this.props.dispatch }
-							name = { device.name }
-							online = { device.online }
-							mode = { device.mode }
-							state = { device.state }
-						/> ) )
-					}
+					<Devices db={ this.props.db } dispatch={ this.props.dispatch } />
 				</div>
 			</MuiThemeProvider>
 		);
