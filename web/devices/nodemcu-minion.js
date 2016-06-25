@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
-import TextField from 'material-ui/TextField';
 import { Card, CardActions, CardHeader, CardTitle, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import ColorPicker from '../components/colorPicker';
@@ -28,6 +27,14 @@ class NodemcuMinion extends Component {
                 green: green,
                 blue: blue
             }
+        } );
+	}
+
+	dispatch( state ) {
+		this.props.dispatch( {
+			id: this.props.id,
+			action: 'set',
+			state: pick( state, [ 'red', 'green', 'blue', 'power' ] )
 		} );
 	}
 
@@ -54,7 +61,7 @@ class NodemcuMinion extends Component {
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
 				<CardHeader
 					title={ this.props.name || this.props.id }
-					subtitle={ "Nodemcu Minion" }
+					subtitle={ this.props.mode + " Minion" }
 					actAsExpander={ true }
 					showExpandableButton={ true }
 				>
@@ -65,6 +72,17 @@ class NodemcuMinion extends Component {
 						label={ this.props.online ? "ONLINE" : "OFFLINE" }
 					/>
 				</CardHeader>
+				{
+					this.props.mode === 'switch' ? <div>
+						<CardTitle title="SWITCH" subtitle="Control a switch" expandable={true} />
+						<Toggle
+							toggled={ !! this.props.state.power }
+							disabled={ false }
+							labelPosition="right"
+							label={ "POWER!!" }
+							onToggle = { ( e, val ) => this.dispatch( { power: val ? 1 : 0 } ) }
+						/>
+					</div> : <div>
 				<CardTitle title="RGB strip" subtitle="Control RGB settings here" expandable={true} />
 
 				<CardText expandable={ true }>
@@ -74,6 +92,8 @@ class NodemcuMinion extends Component {
 				<CardActions expandable={ true }>
 					<FlatButton label="OFF" onClick={ () => { this.off() } } />
 				</CardActions>
+				</div>
+				}
 			</Card>
 		);
 	}

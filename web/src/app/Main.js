@@ -27,6 +27,7 @@ class Main extends Component {
 					devices.push( {
 						id: gateway + '/' + device,
 						online: data.connected,
+						mode: data.mode,
 						name: data.name || data.id,
 						state: data.state
 					} );
@@ -51,6 +52,7 @@ class Main extends Component {
 							dispatch = { this.props.dispatch }
 							name = { device.name }
 							online = { device.online }
+							mode = { device.mode }
 							state = { device.state }
 						/> ) )
 					}

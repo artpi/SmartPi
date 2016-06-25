@@ -55,6 +55,7 @@ NodemcuMinion.prototype.connect = function( firebase, mqtt ) {
 
 NodemcuMinion.prototype.forwardToDevice = function( data ) {
 	var topic = 'iot/things/' + data.id.split( '/' )[ 1 ]; //Remove gateway reference and substitute with iot/things
+	console.log(JSON.stringify( data ));
 	this.client.publish( topic, JSON.stringify( data ) );
 };
 
