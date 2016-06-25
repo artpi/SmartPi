@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import pick from 'lodash/pick';
-import { Card, CardHeader, CardTitle } from 'material-ui/Card';
+import { Card, CardHeader } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import RGBControl from '../modes/rgb-control.js';
+import Switch from '../modes/switch.js';
 
 class NodemcuMinion extends Component {
 	constructor( props, context ) {
@@ -44,16 +45,14 @@ class NodemcuMinion extends Component {
 					/>
 				</CardHeader>
 				{
-					this.props.mode === 'switch' ? <div>
-						<CardTitle title="SWITCH" subtitle="Control a switch" expandable={true} />
-						<Toggle
-							toggled={ !! this.props.state.power }
-							disabled={ false }
-							labelPosition="right"
-							label={ "POWER!!" }
-							onToggle = { ( e, val ) => this.dispatch( { power: val ? 1 : 0 } ) }
-						/>
-					</div> : <RGBControl dispatch={ this.dispatch.bind( this ) } state={ this.props.state } off={ this.off.bind( this ) } />
+					this.props.mode === 'switch' ? <Switch
+						dispatch={ this.dispatch.bind( this ) }
+						state={ this.props.state }
+					/> : <RGBControl
+						dispatch={ this.dispatch.bind( this ) }
+						state={ this.props.state }
+						off={ this.off.bind( this ) }
+					/>
 				}
 			</Card>
 		);
