@@ -1,6 +1,7 @@
 import { createGatewayWorker } from '../firebaseConnection.js' ;
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
+import Animation from '../rgb/animations'
 
 
 function NodemcuMinion( id ) {
@@ -13,6 +14,7 @@ function NodemcuMinion( id ) {
 	this.state = {};
 	this.disconnectTimeout = null;
 	this.connected = false;
+    this.animation = new Animation();
 }
 
 NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
@@ -23,6 +25,7 @@ NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
 
 	if ( ! isEqual( heartbeat.state, this.state ) ) {
 		this.firebase.child( 'state' ).set( heartbeat.state );
+        this.state = heartbeat.state;
 	}
 	if ( ! this.connected ) {
 		this.connected = true;
@@ -72,16 +75,28 @@ NodemcuMinion.prototype.off = function() {
 	} ) );
 };
 
+NodemcuMinion.prototype.onColorChange = function( color ) {
+	var topic = 'iot/things/' + this.id.split( '/' )[ 1 ]; //Remove gateway reference and substitute with iot/things
+	this.client.publish( topic, JSON.stringify( {
+		action: 'set',
+		state: color
+	} ) );
+};
+
+
 NodemcuMinion.prototype.processQueueTask = function( data, progress, resolve, reject ) {
-	//to replace later
+	//to replace later   
 	if ( data.action === 'set' ) {
 		this.forwardToDevice( data );
 		resolve();
-	} else 	if ( data.action === 'off' ) {
+	} else if ( data.action === 'off' ) {
 		this.off();
 		resolve();
-	} else {
-		reject( 'Unknown command' );
+	} else if ( data.action === 'gradient' ) {
+        this.animation.gradient( this.state, data.state, data.duration, this.onColorChange.bind( this ), function() { resolve(); } );
+    }
+    else {
+		reject( 'Unknown command or what' );
 	}
 };
 

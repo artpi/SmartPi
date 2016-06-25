@@ -47,6 +47,13 @@ class NodemcuMinion extends Component {
 			action: 'off'
 		} );
 	}
+    
+    dispatchTrigger ( triggerName ) {
+        this.props.dispatch( {
+            id: this.props.id,
+            triggerName: triggerName
+        } );
+    }
 
 	getTitle() {
 		return ( this.props.name || this.props.id );
@@ -81,6 +88,7 @@ class NodemcuMinion extends Component {
 				<Mode
 					mode = { this.props.mode }
 					dispatch={ this.dispatch.bind( this ) }
+					dispatchTrigger={ this.dispatch.bind( this ) }
 					fetching = { this.state.fetching }
 					state={ this.props.state }
 				/>
