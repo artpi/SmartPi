@@ -14,5 +14,9 @@
   "things": {
   	".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
   	".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
+  },
+  "triggers": {
+    ".read": "root.child('spec').child('users').child( auth.uid ).val() === true",
+    ".write": "root.child('spec').child('users').child( auth.uid ).val() === true"
   }
 }

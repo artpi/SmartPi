@@ -5,6 +5,7 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import Devices from './Devices.js';
+import Triggers from './Triggers.js';
 
 const sidebarItems=[
 	{ id: 'devices', name: 'Devices' },
@@ -47,6 +48,7 @@ class Main extends Component {
 						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>
 					{ this.state.view === 'devices' ? <Devices db={ this.props.db } dispatch={ this.props.dispatch } /> : null }
+					{ this.state.view === 'triggers' ? <Triggers db={ this.props.db } dispatch={ this.props.dispatch } /> : null }
 				</div>
 			</MuiThemeProvider>
 		);
