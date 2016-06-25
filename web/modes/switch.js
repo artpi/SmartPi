@@ -9,12 +9,14 @@ class Switch extends Component {
 
 	render() {
         return ( <div>
-			<CardTitle title="SWITCH" subtitle="Control a switch"/>
 			<Toggle
+				style={ { width: '50%' } }
+				elementStyle={ { width: '200px' } }
+				trackStyle={ { transform: 'scale(1.5)' } }
+				thumbStyle={ { transform: 'scale(2)' } }
 				toggled={ !! this.props.state.power }
 				disabled={ false }
-				labelPosition="right"
-				label={ "POWER!!" }
+				label={ "Turn it on" }
 				onToggle = { ( e, val ) => this.props.dispatch( { power: val ? 1 : 0 } ) }
 			/>
 		</div> );
