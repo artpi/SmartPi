@@ -21,7 +21,7 @@ class ColorPicker extends React.Component {
                 height: '10px'
             },
             lightness: {
-                background: 'linear-gradient(to right, #000 0%,  hsl(' + this.props.hsl.h + ', 100%, 50%) 50%, #fff 100%)',
+                background: 'linear-gradient(to right, #000 0%, hsl(' + this.props.hsl.h + ', 100%, 50%) 50%, #fff 100%)',
                 height: '10px'
             },                        
             
@@ -39,25 +39,11 @@ class ColorPicker extends React.Component {
                     value={this.props.hsl.h}
                     onChange={ (e, val) => this.props.onChange({
                         h: val,
-                        s: this.props.hsl.s,
+                        s: 1,
                         l: this.props.hsl.l
                     })}
                 />
-                <div>Hue</div>                
-                <Slider 
-                    name="s"
-                    min={0}
-                    max={1}
-                    step={.001}
-                    style={styles.saturation}                    
-                    value={this.props.hsl.s}
-                    onChange={ (e, val) => this.props.onChange({
-                        h: this.props.hsl.h,
-                        s: val,
-                        l: this.props.hsl.l
-                    })}    
-                />
-                <div>Saturation</div>                
+                <div>Hue</div>                             
 
                 <Slider 
                     name="l"
@@ -68,7 +54,7 @@ class ColorPicker extends React.Component {
                     value={this.props.hsl.l}
                     onChange={ (e, val) => this.props.onChange({
                         h: this.props.hsl.h,
-                        s: this.props.hsl.s,
+                        s: 1,
                         l: val
                     })}
                 />
