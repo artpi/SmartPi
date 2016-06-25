@@ -7,6 +7,10 @@ import RGBControl from '../modes/rgb-control.js';
 import Switch from '../modes/switch.js';
 import { red500, cyan200 } from 'material-ui/styles/colors';
 
+const styles = {
+	chip: { margin: '0 5px 0 5px' }
+};
+
 class NodemcuMinion extends Component {
 	constructor( props, context ) {
 		super( props, context );
@@ -39,8 +43,14 @@ class NodemcuMinion extends Component {
 				>
 				<div style={ { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: '20px', marginRight: '50px' } }>
 					<b>{ this.props.name || this.props.id }</b>
-					{ some( Object.keys( this.props.state ), key => !! this.props.state[ key ] ) ? <Chip backgroundColor={ cyan200 } onRequestDelete={ this.off.bind( this ) }>ON</Chip> : null }
-					{ ( ! this.props.online ) ? <Chip backgroundColor={ red500 } labelColor={ 'white' }>OFFLINE</Chip> : null }
+					<div style={ { display: 'flex', flexDirection: 'row' } }>
+						{ some( Object.keys( this.props.state ), key => !! this.props.state[ key ] ) && this.props.online
+							? <Chip style={ styles.chip } backgroundColor={ cyan200 } onRequestDelete={ this.off.bind( this ) }>ON</Chip>
+							: null }
+						{ ! this.props.online
+							? <Chip style={ styles.chip } backgroundColor={ red500 } labelColor={ 'white' }>OFFLINE</Chip>
+						: null }
+					</div>
 				</div>
 				</CardHeader>
 				<CardText expandable={ true }>
