@@ -19,7 +19,7 @@ const WrappedPicker = CustomPicker( props => (
 			min={ 0 }
 			max={ 360 }
 			step={ 1 }
-			disabled={ true }
+			disabled={ props.fetching }
 			style={ {
 				background: 'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)',
 				height: '10px'
@@ -38,6 +38,7 @@ const WrappedPicker = CustomPicker( props => (
 			min={ 0 }
 			max={ 1 }
 			step={ .001 }
+			disabled={ props.fetching }
 			style={ {
 				background: 'linear-gradient(to right, #000 0%, hsl(' + props.hsl.h + ', 100%, 50%) 50%, #fff 100%)',
 				height: '10px'
@@ -78,7 +79,7 @@ class RGBControl extends Component {
 		};
 		return ( <div>
 			<CardTitle title="RGB strip" subtitle="Control RGB settings here"/>
-			<WrappedPicker color={ initialColor } onChangeComplete={ this.submit.bind( this ) } />
+			<WrappedPicker color={ initialColor } onChangeComplete={ this.submit.bind( this ) } fetching={ this.props.fetching } />
 			<CardActions>
 				<FlatButton label="OFF" onClick={ this.props.off } />
 			</CardActions>
