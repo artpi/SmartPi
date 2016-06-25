@@ -3,6 +3,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import NodemcuMinion from '../../devices/nodemcu-minion';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
 
 const styles = {
 	container: {
@@ -13,7 +15,8 @@ class Main extends Component {
 	constructor( props, context ) {
 		super( props, context );
 		this.state = {
-			devices: []
+			devices: [],
+			drawer: false
 		};
 	}
 
@@ -36,14 +39,27 @@ class Main extends Component {
 			this.setState( { devices } );
 		} );
 	}
+	handleDrawer() {
+		this.setState({drawer: !this.state.drawer})
+	}
+
 
 	render() {
 		return (
 			<MuiThemeProvider muiTheme={ getMuiTheme() }>
 				<div style={styles.container}>
+					<Drawer
+						docked={ false }
+						open={this.state.drawer}
+						onRequestChange={ this.handleDrawer.bind( this ) }
+					>
+						<MenuItem>Menu Item</MenuItem>
+						<MenuItem>Menu Item 2</MenuItem>
+					</Drawer>
 					<AppBar
 						title="SmartHome super App"
 						iconClassNameRight="muidocs-icon-navigation-expand-more"
+						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>
 					{
 						this.state.devices.map( device => ( <NodemcuMinion
