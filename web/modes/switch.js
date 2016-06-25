@@ -15,7 +15,7 @@ class Switch extends Component {
 				trackStyle={ { transform: 'scale(1.5)' } }
 				thumbStyle={ { transform: 'scale(2)' } }
 				toggled={ !! this.props.state.power }
-				disabled={ false }
+				disabled={ this.props.fetching }
 				label={ "Turn it on" }
 				onToggle = { ( e, val ) => this.props.dispatch( { power: val ? 1 : 0 } ) }
 			/>

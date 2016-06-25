@@ -6,6 +6,8 @@ import Chip from 'material-ui/Chip';
 import RGBControl from '../modes/rgb-control.js';
 import Switch from '../modes/switch.js';
 import { red500, cyan200 } from 'material-ui/styles/colors';
+import deepEqual from 'deep-equal';
+import Snackbar from 'material-ui/Snackbar';
 
 const styles = {
 	chip: { margin: '0 5px 0 5px' }
@@ -19,7 +21,19 @@ class NodemcuMinion extends Component {
 		};
 	}
 
+	getDefaultState() {
+		return {
+			fetching: false
+		};
+	}
+	componentWillReceiveProps( nextProps ) {
+		if ( this.state.fetching && ! deepEqual( nextProps.state, this.props.state ) ) {
+			this.setState( { fetching: false } );
+		}
+	}
+
 	dispatch( state ) {
+		this.setState( { fetching: true } );
 		this.props.dispatch( {
 			id: this.props.id,
 			action: 'set',
@@ -28,6 +42,7 @@ class NodemcuMinion extends Component {
 	}
 
 	off() {
+		this.setState( { fetching: true } );
 		this.props.dispatch( {
 			id: this.props.id,
 			action: 'off'
@@ -45,11 +60,16 @@ class NodemcuMinion extends Component {
 					<b>{ this.props.name || this.props.id }</b>
 					<div style={ { display: 'flex', flexDirection: 'row' } }>
 						{ some( Object.keys( this.props.state ), key => !! this.props.state[ key ] ) && this.props.online
-							? <Chip style={ styles.chip } backgroundColor={ cyan200 } onRequestDelete={ this.off.bind( this ) }>ON</Chip>
+							? <Chip style={ styles.chip } backgroundColor={ cyan200 } onRequestDelete={ this.off.bind( this ) } onTouchTap={ this.off.bind( this ) }>ON</Chip>
 							: null }
 						{ ! this.props.online
 							? <Chip style={ styles.chip } backgroundColor={ red500 } labelColor={ 'white' }>OFFLINE</Chip>
 						: null }
+						<Snackbar
+							open={ this.state.fetching }
+							message="Requesting change"
+							autoHideDuration={ 3000 }
+						/>
 					</div>
 				</div>
 				</CardHeader>
@@ -57,9 +77,11 @@ class NodemcuMinion extends Component {
 				{
 					this.props.mode === 'switch' ? <Switch
 						dispatch={ this.dispatch.bind( this ) }
+						fetching = { this.state.fetching }
 						state={ this.props.state }
 					/> : <RGBControl
 						dispatch={ this.dispatch.bind( this ) }
+						fetching = { this.state.fetching }
 						state={ this.props.state }
 						off={ this.off.bind( this ) }
 					/>

@@ -35,6 +35,7 @@ class ColorPicker extends React.Component {
                     min={0}
                     max={360}
                     step={1}
+                    disabled={ true }
                     style={styles.hue}
                     value={this.props.hsl.h}
                     onChange={ (e, val) => this.props.onChange({
