@@ -25,7 +25,7 @@ class Main extends Component {
 	}
 
 	setView( view ) {
-		this.setState( { view } );
+		this.setState( { view, drawer: false } );
 	}
 
 	render() {
