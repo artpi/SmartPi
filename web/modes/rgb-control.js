@@ -30,15 +30,11 @@ class RGBControl extends Component {
             b: Math.round(blue / 4)
         }
         return ( <div>
-				<CardTitle title="RGB strip" subtitle="Control RGB settings here" expandable={true} />
-
-				<CardText expandable={ true }>
-                    <ColorPicker color={ initialColor }  onChangeComplete={ this.submit.bind( this ) } />
-
-				</CardText>
-				<CardActions expandable={ true }>
-					<FlatButton label="OFF" onClick={ () => { this.props.off() } } />
-				</CardActions>
+			<CardTitle title="RGB strip" subtitle="Control RGB settings here"/>
+            <ColorPicker color={ initialColor }  onChangeComplete={ this.submit.bind( this ) } />
+			<CardActions>
+				<FlatButton label="OFF" onClick={ () => { this.props.off() } } />
+			</CardActions>
 		</div> );
 	}
 }

@@ -9,7 +9,7 @@ class Switch extends Component {
 
 	render() {
         return ( <div>
-			<CardTitle title="SWITCH" subtitle="Control a switch" expandable={true} />
+			<CardTitle title="SWITCH" subtitle="Control a switch"/>
 			<Toggle
 				toggled={ !! this.props.state.power }
 				disabled={ false }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import pick from 'lodash/pick';
-import { Card, CardHeader } from 'material-ui/Card';
+import { Card, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import RGBControl from '../modes/rgb-control.js';
 import Switch from '../modes/switch.js';
@@ -44,6 +44,7 @@ class NodemcuMinion extends Component {
 						label={ this.props.online ? "ONLINE" : "OFFLINE" }
 					/>
 				</CardHeader>
+				<CardText expandable={true}>
 				{
 					this.props.mode === 'switch' ? <Switch
 						dispatch={ this.dispatch.bind( this ) }
@@ -54,6 +55,7 @@ class NodemcuMinion extends Component {
 						off={ this.off.bind( this ) }
 					/>
 				}
+				</CardText>
 			</Card>
 		);
 	}
