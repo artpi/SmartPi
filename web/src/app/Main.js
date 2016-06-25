@@ -6,16 +6,17 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import Devices from './Devices.js';
 
-const styles = {
-	container: {
-	},
-};
+const sidebarItems=[
+	{ id: 'devices', name: 'Devices' },
+	{ id: 'triggers', name: 'Triggers' }
+];
 
 class Main extends Component {
 	constructor( props, context ) {
 		super( props, context );
 		this.state = {
-			drawer: false
+			drawer: false,
+			view: 'devices'
 		};
 	}
 
@@ -23,25 +24,29 @@ class Main extends Component {
 		this.setState( { drawer: !this.state.drawer } );
 	}
 
+	setView( view ) {
+		this.setState( { view } );
+	}
 
 	render() {
 		return (
 			<MuiThemeProvider muiTheme={ getMuiTheme() }>
-				<div style={ styles.container }>
+				<div>
 					<Drawer
 						docked={ false }
 						open={ this.state.drawer }
 						onRequestChange={ this.handleDrawer.bind( this ) }
 					>
-						<MenuItem>Menu Item</MenuItem>
-						<MenuItem>Menu Item 2</MenuItem>
+					{ sidebarItems.map( item => (
+						<MenuItem key={ item.id } onTouchTap={ this.setView.bind( this, item.id ) }>{ item.name }</MenuItem>
+					) ) }
 					</Drawer>
 					<AppBar
 						title="SmartHome super App"
 						iconClassNameRight="muidocs-icon-navigation-expand-more"
 						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>
-					<Devices db={ this.props.db } dispatch={ this.props.dispatch } />
+					{ this.state.view === 'devices' ? <Devices db={ this.props.db } dispatch={ this.props.dispatch } /> : null }
 				</div>
 			</MuiThemeProvider>
 		);
