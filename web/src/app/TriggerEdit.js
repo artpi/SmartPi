@@ -23,9 +23,9 @@ class TriggerEdit extends Component {
 		};
 	}
 
-	updateAction( id, color ) {
-		console.log( 'updating action ' + id + 'with ', color );
-		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( id ).child( 'state' ).set( color );
+	updateAction( id, props ) {
+		console.log( 'updating action ' + id + 'with ', props.state );
+		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( id ).update( props );
 	}
 	
 	updateActionId( oldId, newId ) {
@@ -125,7 +125,7 @@ class TriggerEdit extends Component {
 					duration={ item.duration || null }
 					color={ item.state ? Color( item.state ) : null }
 					state={ item.state || null }
-					dispatch={ ( color ) => { this.updateAction( index, color ) } } 
+					dispatch={ ( props ) => { this.updateAction( index, props ) } } 
 					delete={ () => this.deleteAction( index )}
 				/> )
 				

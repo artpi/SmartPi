@@ -3,6 +3,7 @@ import { Card, CardText, CardHeader, CardActions } from 'material-ui/Card';
 import DeviceMode from '../../../modes';
 import Avatar from 'material-ui/Avatar';
 import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 import ActionDelete from 'material-ui/svg-icons/action/highlight-off';
 
 class ActionEdit extends Component {
@@ -32,9 +33,19 @@ class ActionEdit extends Component {
 				>
 				</CardHeader>
 				<CardText expandable={ true }>
-					{ 	this.props.duration ?						<div>Duration: { this.props.duration }</div> : <div></div>
+					{ 	this.props.duration ?
+						<TextField
+							defaultValue={ this.props.duration }
+							floatingLabelText="Duration (ms)"
+							floatingLabelFixed={true}
+							onChange={ ( e, val ) => {
+								if ( val && val !== '' ) {
+									this.props.dispatch( { duration: val } )
+								}
+							}  }
+						/> : <span></span>
 					}
-					{ /* Przychaczone */ this.props.color ? <DeviceMode mode="rgb" fetching={ false } dispatch={ this.props.dispatch } state={ this.props.state } /> : <b>Sorry, not ready yet</b> }
+					{ /* Przychaczone */ this.props.color ? <DeviceMode mode="rgb" fetching={ false } dispatch={ (color) => this.props.dispatch( { state: color } ) } state={ this.props.state } /> : <b>Sorry, not ready yet</b> }
 					
 				</CardText>
 				<CardActions expandable={ true }>
