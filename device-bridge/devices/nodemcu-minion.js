@@ -83,6 +83,8 @@ NodemcuMinion.prototype.processQueueTask = function( data, progress, resolve, re
 		resolve();
 	} else if ( data.action === 'gradient' ) {
 		animation( this.state, data.state, data.duration, newColor => this.forwardToDevice( { id: this.id, action: 'set', state: newColor } ) ).then( resolve );
+	} else if ( data.action === 'wait' ) {
+		setTimeout( resolve, data.duration );
 	} else {
 		reject( 'Unknown command or what' );
 	}
