@@ -8,7 +8,9 @@ import ActionDelete from 'material-ui/svg-icons/action/highlight-off';
 class ActionEdit extends Component {
 	render() {
 		var deleteIcon = {
-			float: 'right'
+			position: 'absolute',
+			right: 18,
+			top: 24
 		},
 		title = this.props.action;
 
