@@ -83,9 +83,6 @@ class TriggerEdit extends Component {
 	}
 
 	render() {
-		const addButton = {
-			float: 'right'
-		}
 		
 		const dialogActions = [
 			<FlatButton label='Cancel' primary={ false } onTouchTap={ () => this.setState( { newAction: null } )} />,
@@ -97,8 +94,10 @@ class TriggerEdit extends Component {
 					<CardHeader 
 						title={ 'Editing trigger ' + this.props.triggerName }
 					>
-						<FlatButton style={ addButton } label='Add action' labelPosition='before' icon={ <Add /> } onTouchTap={ () => this.setState( { newAction: {} } ) } />
 					</CardHeader>
+					<CardText >
+						<FlatButton label='Add action' labelPosition='before' icon={ <Add /> } onTouchTap={ () => this.setState( { newAction: {} } ) } />				
+					</CardText>
 					<CardActions>
 						<FlatButton label="Test" onTouchTap={ () => this.props.dispatch( { triggerName: this.props.triggerName } ) } />
 						<Link to={ `triggers/` }><FlatButton label="Back" /></Link>
