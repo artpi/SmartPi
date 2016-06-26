@@ -1,5 +1,6 @@
-# Firenet of things AKA SmartPi AKA this crazy dude's smarthome rig.
+# Firenet of things AKA SmartPi
 
+A SmartHome setup using Google Firebase and $4 modules. Can do a lot of awesome stuff.
 
 #### Features
 
@@ -20,7 +21,22 @@
 
 #### Quick install
 
-TBD
+1. You need devices that communicate with this project. I recommend [nodemcu-minion with ESP8266](https://github.com/artpi/nodemcu-minion)
+2. Install mqtt broker on your device at home ( Raspberry Pi? ). `apt-get install mosquitto`
+3. [Sign up for a free Google Firebase account](https://firebase.google.com/)
+4. Download server account keys for firebase and save them as `device-bridge/config-firebaseKeys.json`
+5. Edit `device-bridge/config.js` with your config:
+```
+export default {
+	id: 'smart-pi',
+	broker: 'mqtt://...',
+	firebase: 'https://....firebaseio.com'
+};
+```
+6. Save config for the [web console from firebase setup](https://firebase.google.com/docs/web/setup) as `web/config-firebase.js`
+7. Run Device Bridge (in your raspberry pi) : `cd device-bridge && npm install && npm run`
+8. Run your reb interface : `cd web && npm install && npm run`
+9. Profit
 
 ## Architecture
 
@@ -32,7 +48,7 @@ All in all, I settled on Firebase, which is real-time cloud json database from G
 authentication and authorization.
 
 All this would not be possible without glorious ESP8266 chips. They are like Arduino with Wifi and they are running NodeMCU firmware which you program in lua script ( similar to JS ).
-I have started putting up a [ Plug&Play firmware called nodemcu-minion](./devices/nodemcu-minion) which requires no programming to setup. Work in progress.
+I have started putting up a [ Plug&Play firmware called nodemcu-minion](https://github.com/artpi/nodemcu-minion) which requires no programming to setup.
 
 In overall design I wanted to follow "microservices" approach while keeping it sane. Everything should scale nicely.
 
