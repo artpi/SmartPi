@@ -4,7 +4,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import Main from './Main'; // Our custom react component
 import firebase from 'firebase';
 import config from '../config-firebase';
-import { Router, Route, hashHistory } from 'react-router';
+import { Router, Route, hashHistory, IndexRoute } from 'react-router';
 import Devices from './Devices.js';
 import Triggers from './Triggers.js';
 
@@ -26,7 +26,7 @@ function loggedIn( user ) {
 				<Route path="/" component={ Main }>
 					<Route path="devices" component={ () => <Devices { ...componentProps } /> }/>
 					<Route path="triggers" component={ () => <Triggers { ...componentProps } /> }/>
-					<Route path="*" component={ () => <Devices { ...componentProps } /> } />
+					<IndexRoute component={ () => <Devices { ...componentProps } /> }/>
 				</Route>
 			</Router>
 		),
