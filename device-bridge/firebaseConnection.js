@@ -19,9 +19,10 @@ export function createGatewayWorker( firebase, gatewayKey, processFunction ) {
 			} );
 		}
 	} );
+	console.log( 'new q', gatewayKey );
 	return new Queue(
 		getQueueRef( firebase ),
-		{ specId: gatewayKey },
+		{ specId: gatewayKey, numWorkers: 1 },
 		processFunction
 	);
 }
