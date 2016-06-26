@@ -3,11 +3,10 @@ import pick from 'lodash/pick';
 import some from 'lodash/some';
 import { Card, CardHeader, CardText } from 'material-ui/Card';
 import Chip from 'material-ui/Chip';
-import RGBControl from '../modes/rgb-control.js';
-import Switch from '../modes/switch.js';
 import { red500, cyan200 } from 'material-ui/styles/colors';
 import deepEqual from 'deep-equal';
 import Snackbar from 'material-ui/Snackbar';
+import getModeComponent from '../modes';
 
 const styles = {
 	chip: { margin: '0 5px 0 5px' }
@@ -54,6 +53,7 @@ class NodemcuMinion extends Component {
 	}
 
 	render() {
+		const ModeComponent = getModeComponent( this.props.mode );
 		return (
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
 				<CardHeader
@@ -80,16 +80,11 @@ class NodemcuMinion extends Component {
 				</CardHeader>
 				<CardText expandable={ true }>
 				{
-					this.props.mode === 'switch' ? <Switch
+					ModeComponent ? <ModeComponent
 						dispatch={ this.dispatch.bind( this ) }
 						fetching = { this.state.fetching }
 						state={ this.props.state }
-					/> : <RGBControl
-						dispatch={ this.dispatch.bind( this ) }
-						fetching = { this.state.fetching }
-						state={ this.props.state }
-						off={ this.off.bind( this ) }
-					/>
+					/> : null
 				}
 				</CardText>
 			</Card>
