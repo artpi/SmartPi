@@ -65,8 +65,8 @@ class RGBControl extends Component {
 			green: Math.round( color.rgb.g * 4 ),
 			blue: Math.round( color.rgb.b * 4 )
 		} );
-	}
-
+	}   
+    
 	render() {
 		var red = get( this.props, [ 'state', 'red' ], '' );
 		var green = get( this.props, [ 'state', 'green' ], '' );
@@ -81,7 +81,7 @@ class RGBControl extends Component {
 			<CardTitle title="RGB strip" subtitle="Control RGB settings here"/>
 			<WrappedPicker color={ initialColor } onChangeComplete={ this.submit.bind( this ) } fetching={ this.props.fetching } />
 			<CardActions>
-				<FlatButton label="OFF" onClick={ this.props.off } />
+				<FlatButton label="OFF" onClick={ () => { this.props.off() } } />
 			</CardActions>
 		</div> );
 	}

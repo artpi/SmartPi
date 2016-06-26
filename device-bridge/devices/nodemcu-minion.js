@@ -1,12 +1,12 @@
 import { createGatewayWorker } from '../firebaseConnection.js' ;
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-
+import animation from '../rgb/animations';
 
 function NodemcuMinion( id ) {
 	this.id = id;
-    this.type = 'nodemcu-minion';
-    this.mode = 'rgb';
+	this.type = 'nodemcu-minion';
+	this.mode = 'rgb';
 	this.firebase = null;
 	this.firebaseRoot = null;
 	this.queue = null;
@@ -23,9 +23,9 @@ NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
 
 	if ( ! isEqual( heartbeat.state, this.state ) ) {
 		this.firebase.child( 'state' ).set( heartbeat.state );
+		this.state = heartbeat.state;
 	}
 	if ( ! this.connected ) {
-		this.connected = true;
 		this.connectQueue();
 		this.firebase.child( 'connected' ).set( this.connected );
 	}
@@ -42,20 +42,21 @@ NodemcuMinion.prototype.disconnect = function() {
 };
 
 NodemcuMinion.prototype.connectQueue = function() {
+	this.connected = true;
 	this.queue = createGatewayWorker( this.firebaseRoot, this.id, this.processQueueTask.bind( this ) );
 };
 
 NodemcuMinion.prototype.connect = function( firebase, mqtt ) {
 	this.firebaseRoot = firebase;
 	this.firebase = firebase.database().ref( 'things/' + this.id );
-    this.firebase.child( 'type' ).set( this.type );
+	this.firebase.child( 'type' ).set( this.type );
 	this.client = mqtt;
 	this.connectQueue();
 };
 
 NodemcuMinion.prototype.forwardToDevice = function( data ) {
 	var topic = 'iot/things/' + data.id.split( '/' )[ 1 ]; //Remove gateway reference and substitute with iot/things
-	console.log(JSON.stringify( data ));
+	console.log( JSON.stringify( data ) );
 	this.client.publish( topic, JSON.stringify( data ) );
 };
 
@@ -77,11 +78,15 @@ NodemcuMinion.prototype.processQueueTask = function( data, progress, resolve, re
 	if ( data.action === 'set' ) {
 		this.forwardToDevice( data );
 		resolve();
-	} else 	if ( data.action === 'off' ) {
+	} else if ( data.action === 'off' ) {
 		this.off();
 		resolve();
+	} else if ( data.action === 'gradient' ) {
+		animation( this.state, data.state, data.duration, newColor => this.forwardToDevice( { id: this.id, action: 'set', state: newColor } ) ).then( resolve );
+	} else if ( data.action === 'wait' ) {
+		setTimeout( resolve, data.duration );
 	} else {
-		reject( 'Unknown command' );
+		reject( 'Unknown command or what' );
 	}
 };
 
