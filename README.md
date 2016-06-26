@@ -2,6 +2,11 @@
 
 A SmartHome setup using Google Firebase and $4 modules. Can do a lot of awesome stuff.
 
+| Devices list                        | Main menu                           | RGB lamp control                    | Composing triggers                  |
+|-------------------------------------|-------------------------------------|-------------------------------------|-------------------------------------|
+|![](https://cldup.com/n84sS0Fi9M.png)|![](https://cldup.com/-n1hCbb30L.png)|![](https://cldup.com/7BJc3cMJIU.png)|![](https://cldup.com/wOSFFjdpGu.png)|
+
+
 #### Features
 
 - Wireless control over $4 ESP8266 modules
