@@ -75,7 +75,7 @@ class RGBControl extends Component {
 		var initialColor = {
 			r: Math.round( red / 4 ),
 			g: Math.round( green / 4 ),
-			b: Math.round( blue / 4)
+			b: Math.round( blue / 4 )
 		};
 		return ( <div>
 			<CardTitle title="RGB strip" subtitle="Control RGB settings here"/>
