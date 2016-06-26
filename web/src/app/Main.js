@@ -42,7 +42,7 @@ class Main extends Component {
 					) ) }
 					</Drawer>
 					<AppBar
-						title="SmartHome super App"
+						title="Firenet of Things"
 						iconClassNameRight="muidocs-icon-navigation-expand-more"
 						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>

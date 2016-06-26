@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import Menu from 'material-ui/Menu';
-import MenuItem from 'material-ui/MenuItem';
+import { List, ListItem } from 'material-ui/List';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import { Link } from 'react-router';
 
 class Triggers extends Component {
 	constructor( props, context ) {
@@ -16,8 +17,8 @@ class Triggers extends Component {
 			triggers.forEach( trigger => {
 				triggerArray.push( {
 					id: trigger.key
-				} )
-			} )
+				} );
+			} );
 			this.setState( { triggers: triggerArray } );
 		} );
 	}
@@ -27,13 +28,19 @@ class Triggers extends Component {
 	}
 
 	render() {
-		return ( <Menu>
+		return ( <List>
 			{
-				this.state.triggers.map( item => 
-					<MenuItem key={ item.id } onTouchTap={ this.dispatchTrigger.bind( this, item.id ) }>{ item.id }</MenuItem>
-				)
+				this.state.triggers.map( item => <ListItem
+					key={ item.id }
+					onTouchTap={ this.dispatchTrigger.bind( this, item.id ) }
+					rightIcon={
+						<Link to={ `triggers/edit/${ item.id }` }><EditIcon /></Link>
+					}
+				>
+					{ item.id }
+				</ListItem> )
 			}
-		</Menu> );
+		</List> );
 	}
 }
 

@@ -7,6 +7,7 @@ import config from '../config-firebase';
 import { Router, Route, hashHistory, IndexRoute } from 'react-router';
 import Devices from './Devices.js';
 import Triggers from './Triggers.js';
+import TriggerEdit from './TriggerEdit.js';
 
 const app = firebase.initializeApp( config );
 const db = firebase.database();
@@ -25,6 +26,7 @@ function loggedIn( user ) {
 			<Router history={ hashHistory }>
 				<Route path="/" component={ Main }>
 					<Route path="devices" component={ () => <Devices { ...componentProps } /> }/>
+					<Route path="triggers/edit/:triggerName" component={ props => <TriggerEdit { ...componentProps } triggerName={ props.params.triggerName } /> }/>
 					<Route path="triggers" component={ () => <Triggers { ...componentProps } /> }/>
 					<IndexRoute component={ () => <Devices { ...componentProps } /> }/>
 				</Route>
