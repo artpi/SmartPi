@@ -6,7 +6,7 @@ import Chip from 'material-ui/Chip';
 import { red500, cyan200 } from 'material-ui/styles/colors';
 import deepEqual from 'deep-equal';
 import Snackbar from 'material-ui/Snackbar';
-import getModeComponent from '../modes';
+import Mode from '../modes';
 
 const styles = {
 	chip: { margin: '0 5px 0 5px' }
@@ -53,7 +53,6 @@ class NodemcuMinion extends Component {
 	}
 
 	render() {
-		const ModeComponent = getModeComponent( this.props.mode );
 		return (
 			<Card expanded={this.state.expanded} onExpandChange={this.handleExpandChange} style={ { margin: 10 } }>
 				<CardHeader
@@ -79,13 +78,12 @@ class NodemcuMinion extends Component {
 				</div>
 				</CardHeader>
 				<CardText expandable={ true }>
-				{
-					ModeComponent ? <ModeComponent
-						dispatch={ this.dispatch.bind( this ) }
-						fetching = { this.state.fetching }
-						state={ this.props.state }
-					/> : null
-				}
+				<Mode
+					mode = { this.props.mode }
+					dispatch={ this.dispatch.bind( this ) }
+					fetching = { this.state.fetching }
+					state={ this.props.state }
+				/>
 				</CardText>
 			</Card>
 		);
