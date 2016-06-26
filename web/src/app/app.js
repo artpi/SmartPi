@@ -4,6 +4,9 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import Main from './Main'; // Our custom react component
 import firebase from 'firebase';
 import config from '../config-firebase';
+import { Router, Route, hashHistory } from 'react-router';
+import Devices from './Devices.js';
+import Triggers from './Triggers.js';
 
 const app = firebase.initializeApp( config );
 const db = firebase.database();
@@ -11,17 +14,22 @@ const db = firebase.database();
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
 
-function dispatch( action ) {
-	db.ref( 'dispatch' ).push( action );
-}
+const componentProps = {
+	db,
+	dispatch: action => db.ref( 'dispatch' ).push( action )
+};
 
 function loggedIn( user ) {
 	document.getElementById( 'logged-out' ).style.display = 'none';
-	render( <Main
-			db={ db }
-			dispatch={ dispatch }
-			user={ user }
-		/>,
+	render( (
+			<Router history={ hashHistory }>
+				<Route path="/" component={ Main }>
+					<Route path="devices" component={ () => <Devices { ...componentProps } /> }/>
+					<Route path="triggers" component={ () => <Triggers { ...componentProps } /> }/>
+					<Route path="*" component={ () => <Devices { ...componentProps } /> } />
+				</Route>
+			</Router>
+		),
 		document.getElementById( 'app' )
 	);
 }

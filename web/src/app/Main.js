@@ -4,8 +4,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import Devices from './Devices.js';
-import Triggers from './Triggers.js';
+import { hashHistory } from 'react-router';
 
 const sidebarItems=[
 	{ id: 'devices', name: 'Devices' },
@@ -16,8 +15,7 @@ class Main extends Component {
 	constructor( props, context ) {
 		super( props, context );
 		this.state = {
-			drawer: false,
-			view: 'devices'
+			drawer: false
 		};
 	}
 
@@ -26,7 +24,8 @@ class Main extends Component {
 	}
 
 	setView( view ) {
-		this.setState( { view, drawer: false } );
+		hashHistory.push( view );
+		this.setState( { drawer: false } );
 	}
 
 	render() {
@@ -47,8 +46,7 @@ class Main extends Component {
 						iconClassNameRight="muidocs-icon-navigation-expand-more"
 						onLeftIconButtonTouchTap={ this.handleDrawer.bind( this ) }
 					/>
-					{ this.state.view === 'devices' ? <Devices db={ this.props.db } dispatch={ this.props.dispatch } /> : null }
-					{ this.state.view === 'triggers' ? <Triggers db={ this.props.db } dispatch={ this.props.dispatch } /> : null }
+					{ this.props.children }
 				</div>
 			</MuiThemeProvider>
 		);
