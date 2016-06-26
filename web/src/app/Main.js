@@ -3,12 +3,15 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
 import { hashHistory } from 'react-router';
+import { List, ListItem } from 'material-ui/List';
+import DevicesIcon from 'material-ui/svg-icons/action/important-devices';
+import TriggersIcon from 'material-ui/svg-icons/action/launch';
+import Subheader from 'material-ui/Subheader';
 
 const sidebarItems=[
-	{ id: 'devices', name: 'Devices' },
-	{ id: 'triggers', name: 'Triggers' }
+	{ id: 'devices', name: 'Devices', icon: <DevicesIcon /> },
+	{ id: 'triggers', name: 'Triggers', icon: <TriggersIcon /> }
 ];
 
 class Main extends Component {
@@ -37,9 +40,12 @@ class Main extends Component {
 						open={ this.state.drawer }
 						onRequestChange={ this.handleDrawer.bind( this ) }
 					>
-					{ sidebarItems.map( item => (
-						<MenuItem key={ item.id } onTouchTap={ this.setView.bind( this, item.id ) }>{ item.name }</MenuItem>
-					) ) }
+					<List style={ { marginTop: '50px' } }>
+						<Subheader>Awesome Menu</Subheader>
+						{ sidebarItems.map( item => (
+							<ListItem leftIcon={ item.icon } key={ item.id } onTouchTap={ this.setView.bind( this, item.id ) }>{ item.name }</ListItem>
+						) ) }
+					</List>
 					</Drawer>
 					<AppBar
 						title="Firenet of Things"
