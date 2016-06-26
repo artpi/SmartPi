@@ -9,6 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import ActionEdit from './components/actionEdit';
 import { Link } from 'react-router';
 import Add from 'material-ui/svg-icons/content/add';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 
 
 console.log( DeviceMode );
@@ -95,9 +96,6 @@ class TriggerEdit extends Component {
 						title={ 'Editing trigger ' + this.props.triggerName }
 					>
 					</CardHeader>
-					<CardText >
-						<FlatButton label='Add action' labelPosition='before' icon={ <Add /> } onTouchTap={ () => this.setState( { newAction: {} } ) } />				
-					</CardText>
 					<CardActions>
 						<FlatButton label="Test" onTouchTap={ () => this.props.dispatch( { triggerName: this.props.triggerName } ) } />
 						<Link to={ `triggers/` }><FlatButton label="Back" /></Link>
@@ -130,6 +128,9 @@ class TriggerEdit extends Component {
 				/> )
 				
 			}
+			<FloatingActionButton onTouchEnd={ () => this.setState( { newAction: {} } ) } style={ { margin: '30px', position: 'absolute', 'right': '0px' } }>
+				<Add />
+			</FloatingActionButton>
 		</div> );
 	}
 }
