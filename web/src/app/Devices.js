@@ -8,10 +8,12 @@ class Devices extends Component {
 		this.state = {
 			devices: []
 		};
+		this.dbDevices = this.props.db.ref( 'things' );
+		this.dbDevicesEvent = null;
 	}
 
 	componentDidMount() {
-		this.props.db.ref( 'things' ).on( 'value', gateways => {
+		this.dbDevicesEvent = this.dbDevices.on( 'value', gateways => {
 			const devices = [];
 			gateways = gateways.val();
 			for ( let gateway in gateways ) {
@@ -28,6 +30,10 @@ class Devices extends Component {
 			}
 			this.setState( { devices } );
 		} );
+	}
+
+	componentWillUnmount() {
+		this.dbDevices.off( 'value', this.dbDevicesEvent );
 	}
 
 	render() {

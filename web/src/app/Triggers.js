@@ -9,11 +9,13 @@ class Triggers extends Component {
 		this.state = {
 			triggers: []
 		};
+		this.dbTriggers = this.props.db.ref( 'triggers' );
+		this.dbTriggersEvent = null;
 	}
 
 	componentDidMount() {
 		const triggerArray = [];
-		this.props.db.ref( 'triggers' ).on( 'value', triggers => {
+		this.dbTriggersEvent = this.dbTriggers.on( 'value', triggers => {
 			triggers.forEach( trigger => {
 				triggerArray.push( {
 					id: trigger.key
@@ -21,6 +23,10 @@ class Triggers extends Component {
 			} );
 			this.setState( { triggers: triggerArray } );
 		} );
+	}
+
+	componentWillUnmount() {
+		this.dbTriggers.off( 'value', this.dbTriggersEvent );
 	}
 
 	dispatchTrigger( trigger ) {

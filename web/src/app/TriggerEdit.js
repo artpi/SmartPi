@@ -13,6 +13,8 @@ class TriggerEdit extends Component {
 	constructor( props, context ) {
 		super( props, context );
 		this.state = { actions: {}, id: '' };
+		this.dbTriggerActions = this.props.db.ref( 'triggers' ).child( this.props.triggerName ).child( 'actions' );
+		this.dbTriggerActionsEvent = null;
 	}
 
 	updateAction( id, props ) {
@@ -77,10 +79,7 @@ class TriggerEdit extends Component {
 		const dbPromises = [];
 		const actions = {};
 
-		this.props.db.ref( 'triggers' )
-		.child( this.props.triggerName )
-		.child( 'actions' )
-		.on( 'value', triggerActions => {
+		this.dbTriggerActionsEvent = this.dbTriggerActions.on( 'value', triggerActions => {
 			triggerActions.forEach( actionShapshot => {
 				const action = actionShapshot.val();
 				actions[ actionShapshot.key ] = action;
@@ -95,6 +94,10 @@ class TriggerEdit extends Component {
 			Promise.all( dbPromises )
 			.then( () => this.setState( { actions } ) );
 		} );
+	}
+
+	componentWillUnmount() {
+		this.dbTriggerActions.off( 'value', this.dbTriggerActionsEvent );
 	}
 
 	render() {
