@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Toggle from 'material-ui/Toggle';
 import AvatarComponent from 'material-ui/Avatar';
+import On from 'material-ui/svg-icons/file/cloud-done';
+import Off from 'material-ui/svg-icons/file/cloud-off';
 
-export const Avatar = props => <AvatarComponent>{ props.children }</AvatarComponent>;
+export const Avatar = props => <AvatarComponent icon={ props.power ? <On /> : <Off /> }></AvatarComponent>;
 
 class Switch extends Component {
 	constructor( props, context ) {
