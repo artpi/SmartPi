@@ -14,7 +14,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 class TriggerEdit extends Component {
 	constructor( props, context ) {
 		super( props, context );
-		this.state = { trigger: { actions: [] } };
+		this.state = { actions: {}, id: '' };
 	}
 
 	updateAction( id, props ) {
@@ -38,7 +38,7 @@ class TriggerEdit extends Component {
 	}
 
 	newAction( type, id = 'smart-pi/13554337' ) {
-		var index = this.state.trigger.actions.length,
+		var index = this.state.actions.length,
 			action = {
 				action: type,
 				id: id
@@ -76,9 +76,27 @@ class TriggerEdit extends Component {
 	}
 
 	componentDidMount() {
-		this.props.db.ref( 'triggers/' + this.props.triggerName ).on( 'value', trigger => this.setState( {
-				trigger: trigger.val()
-		} ) );
+		const dbPromises = [];
+		const actions = {};
+
+		this.props.db.ref( 'triggers' )
+		.child( this.props.triggerName )
+		.child( 'actions' )
+		.on( 'value', triggerActions => {
+			triggerActions.forEach( actionShapshot => {
+				const action = actionShapshot.val();
+				actions[ actionShapshot.key ] = action;
+				dbPromises.push(
+					this.props.db.ref( 'things/' + action.id )
+					.child( 'mode' )
+					.once( 'value', snapshot => {
+						action.mode = snapshot.val();
+					} )
+				);
+			} );
+			Promise.all( dbPromises )
+			.then( () => this.setState( { actions } ) );
+		} );
 	}
 
 	render() {
@@ -106,8 +124,9 @@ class TriggerEdit extends Component {
 				<Dialog title='New action' actions={ dialogActions } modal={ true } open={!! this.state.newAction }>
 					<div>Choose new action type:</div>
 					<SelectField
-			value={ this.state.newActionType }
-			onChange={ ( event, index, value ) => this.setState( { newActionType: value } )} >
+						value={ this.state.newActionType }
+						onChange={ ( event, index, value ) => this.setState( { newActionType: value } ) }
+					>
 						<MenuItem value='set' primaryText='Set color' />
 						<MenuItem value='gradient' primaryText='Soft color gradient' />
 						<MenuItem value='wait' primaryText='Wait' />
@@ -115,22 +134,21 @@ class TriggerEdit extends Component {
 					</SelectField>
 				</Dialog>
 
-			{
-			this.state.trigger.actions.map( ( item, index ) => <ActionEdit
-				key={ index }
-				index={ index }
-				id={ item.id }
-				action={ item.action }
-				duration={ item.duration || null }
-				color={ item.state ? Color( item.state ) : null }
-				state={ item.state || null }
-				dispatch={ ( props ) => {
-					this.updateAction( index, props );
-				} }
-				delete={ ( ) => this.deleteAction( index ) }
-				/> )
-
-			}
+			{ Object.keys( this.state.actions ).map( ( index, nvm, keys, item = this.state.actions[ index ] ) =>
+				<ActionEdit
+					key={ index }
+					index={ index }
+					id={ item.id }
+					action={ item.action }
+					duration={ item.duration || null }
+					color={ item.state ? Color( item.state ) : null }
+					state={ item.state || null }
+					dispatch={ ( props ) => {
+						this.updateAction( index, props );
+					} }
+					delete={ ( ) => this.deleteAction( index ) }
+				/>
+			) }
 			<FloatingActionButton onTouchEnd={ ( ) => this.setState( { newAction: {} } ) } style={ {
 				margin: '30px',
 				position: 'absolute',
