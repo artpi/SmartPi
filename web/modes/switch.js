@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { CardTitle } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
+import AvatarComponent from 'material-ui/Avatar';
+
+export const Avatar = props => <AvatarComponent>{ props.children }</AvatarComponent>;
 
 class Switch extends Component {
 	constructor( props, context ) {
@@ -14,7 +16,7 @@ class Switch extends Component {
 				elementStyle={ { width: '200px' } }
 				trackStyle={ { transform: 'scale(1.5)' } }
 				thumbStyle={ { transform: 'scale(2)' } }
-				toggled={ !! this.props.state.power }
+				toggled={ this.props.state && !! this.props.state.power }
 				disabled={ this.props.fetching }
 				label={ "Turn it on" }
 				onToggle = { ( e, val ) => this.props.dispatch( { power: val ? 1 : 0 } ) }

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Card, CardText, CardHeader, CardActions } from 'material-ui/Card';
-import DeviceMode from '../../modes';
-import Color from '../../utils/color';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import SelectField from 'material-ui/SelectField';
@@ -140,8 +138,8 @@ class TriggerEdit extends Component {
 					index={ index }
 					id={ item.id }
 					action={ item.action }
+					mode={ item.mode }
 					duration={ item.duration || null }
-					color={ item.state ? Color( item.state ) : null }
 					state={ item.state || null }
 					dispatch={ ( props ) => {
 						this.updateAction( index, props );

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import pick from 'lodash/pick';
 import some from 'lodash/some';
-import { Card, CardHeader, CardText } from 'material-ui/Card';
+import { Card, CardHeader, CardText, CardActions } from 'material-ui/Card';
+import RaisedButton from 'material-ui/RaisedButton';
+import IconOff from 'material-ui/svg-icons/action/highlight-off';
 import Chip from 'material-ui/Chip';
 import { red500, cyan200 } from 'material-ui/styles/colors';
 import deepEqual from 'deep-equal';
@@ -47,13 +49,6 @@ class NodemcuMinion extends Component {
 			action: 'off'
 		} );
 	}
-    
-    dispatchTrigger ( triggerName ) {
-        this.props.dispatch( {
-            id: this.props.id,
-            triggerName: triggerName
-        } );
-    }
 
 	getTitle() {
 		return ( this.props.name || this.props.id );
@@ -88,10 +83,12 @@ class NodemcuMinion extends Component {
 				<Mode
 					mode = { this.props.mode }
 					dispatch={ this.dispatch.bind( this ) }
-					dispatchTrigger={ this.dispatch.bind( this ) }
 					fetching = { this.state.fetching }
 					state={ this.props.state }
 				/>
+				<CardActions style={ { display: 'flex', justifyContent: 'flex-end' } }>
+					<RaisedButton icon={ <IconOff /> } primary={ true } label="OFF" onClick={ () => this.off() } />
+				</CardActions>
 				</CardText>
 			</Card>
 		);

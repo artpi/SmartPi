@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { CardActions, CardTitle } from 'material-ui/Card';
 import get from 'lodash/get';
-import FlatButton from 'material-ui/FlatButton';
 import { CustomPicker } from 'react-color';
 import Slider from 'material-ui/Slider';
+import Color from '../utils/color';
+import AvatarComponent from 'material-ui/Avatar';
+
+export const Avatar = props => <AvatarComponent backgroundColor={ props.state ? Color( props.state ) : null }>{ props.children }</AvatarComponent>;
 
 const WrappedPicker = CustomPicker( props => (
 	<div>
@@ -78,11 +80,8 @@ class RGBControl extends Component {
 			b: Math.round( blue / 4 )
 		};
 		return ( <div>
-			<CardTitle title="RGB strip" subtitle="Control RGB settings here"/>
+			<p>You can change the color of RGB Lamp</p>
 			<WrappedPicker color={ initialColor } onChangeComplete={ this.submit.bind( this ) } fetching={ this.props.fetching } />
-			<CardActions>
-				<FlatButton label="OFF" onClick={ () => { this.props.off() } } />
-			</CardActions>
 		</div> );
 	}
 }

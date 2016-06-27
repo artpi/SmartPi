@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Card, CardText, CardHeader, CardActions } from 'material-ui/Card';
-import DeviceMode from '../../../modes';
-import Avatar from 'material-ui/Avatar';
+import ModeEditor, { Avatar } from '../../../modes';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import ActionDelete from 'material-ui/svg-icons/action/highlight-off';
+import pick from 'lodash/pick';
 
 class ActionEdit extends Component {
 	render() {
@@ -26,9 +26,7 @@ class ActionEdit extends Component {
 					title={ title }
 					actAsExpander={ true }
 					showExpandableButton={ true }
-					avatar={
-					<Avatar backgroundColor={ this.props.color }>{ this.props.index }</Avatar>
-					}
+					avatar={ <Avatar { ...pick( this.props, [ 'state', 'mode' ] ) }>{ this.props.index }</Avatar> }
 				/ >
 				<CardText expandable={ true }>
 					{ 	this.props.duration ?
@@ -43,10 +41,10 @@ class ActionEdit extends Component {
 							} }
 						/> : <span></span>
 					}
-					{ /* Przychaczone */ this.props.color ? <DeviceMode mode="rgb" fetching={ false } dispatch={ ( color ) => this.props.dispatch( { state: color } ) } state={ this.props.state } /> : <b>Sorry, not ready yet</b> }
+					<ModeEditor mode={ this.props.mode } fetching={ false } dispatch={ ( color ) => this.props.dispatch( { state: color } ) } state={ this.props.state } />
 				</CardText>
 				<CardActions expandable={ true }>
-					<FlatButton style={ deleteIcon } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />				
+					<FlatButton style={ deleteIcon } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />
 				</CardActions>
 			</Card>
 			);
