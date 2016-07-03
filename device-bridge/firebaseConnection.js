@@ -46,7 +46,7 @@ export function createMainWorker( firebase ) {
 			} );
 		} else if ( data.triggerName ) {
 			console.log( 'trigger', data );
-			firebase.database().ref( 'triggers/' + data.triggerName + '/actions' ).once( 'value' )
+			firebase.database().ref( 'triggers/' + data.triggerName + '/actions' ).orderByChild( 'order' ).once( 'value' )
 			.then( function( actions ) {
 				if ( ! actions.exists() ) {
 					console.log( 'trigger does not exist' );
