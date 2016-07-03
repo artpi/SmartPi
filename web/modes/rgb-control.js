@@ -7,6 +7,7 @@ import AvatarComponent from 'material-ui/Avatar';
 
 export const Avatar = props => <AvatarComponent backgroundColor={ props.state ? Color( props.state ) : null }>{ props.children }</AvatarComponent>;
 
+
 const WrappedPicker = CustomPicker( props => (
 	<div>
 		<div style={ {
@@ -85,5 +86,10 @@ class RGBControl extends Component {
 		</div> );
 	}
 }
+
+export const deviceActions = {
+	set: { 'name': 'Set Color', component: RGBControl },
+	gradient: { 'name': 'Color Transition', component: null },
+};
 
 export default RGBControl;

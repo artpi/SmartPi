@@ -1,12 +1,12 @@
 import React from 'react';
 import get from 'lodash/get';
 
-import RGBControl, { Avatar as RGBAvatar } from '../modes/rgb-control.js';
-import Switch, { Avatar as SwitchAvatar } from '../modes/switch.js';
+import RGBControl, { Avatar as RGBAvatar, deviceActions as rgbActions } from '../modes/rgb-control.js';
+import Switch, { Avatar as SwitchAvatar, deviceActions as switchActions } from '../modes/switch.js';
 
 const modeMapping = {
-	rgb: { edit: RGBControl, avatar: RGBAvatar },
-	'switch': { edit: Switch, avatar: SwitchAvatar }
+	rgb: { edit: RGBControl, avatar: RGBAvatar, actions: rgbActions },
+	'switch': { edit: Switch, avatar: SwitchAvatar, actions: switchActions }
 };
 
 export function getModeComponent( mode ) {
@@ -34,3 +34,5 @@ export const Avatar = props => {
 		);
 	}
 };
+
+export const getActions = mode => modeMapping[ mode ].actions;

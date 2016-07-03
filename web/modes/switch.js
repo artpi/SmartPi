@@ -27,4 +27,8 @@ class Switch extends Component {
 	}
 }
 
+export const deviceActions = {
+	set: { 'name': 'Control state', component: Switch }
+};
+
 export default Switch;
