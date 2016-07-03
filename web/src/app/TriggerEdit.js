@@ -50,7 +50,6 @@ class TriggerEdit extends Component {
 	}
 
 	render() {
-		console.log( this.state.actions );
 		return ( <div>
 			<Card key={ this.props.triggerName } >
 				<CardHeader title={ 'Editing trigger ' + this.props.triggerName } />
