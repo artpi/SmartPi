@@ -15,7 +15,6 @@ export function getModeComponent( mode ) {
 }
 
 export default ( props ) => {
-	console.log( props.state );
 	const ModeComponent = ( modeMapping[ props.mode ].actions[ props.action ] || nodemcuActions[ props.action ] ).component;
 	if ( !ModeComponent ) {
 		return null;
