@@ -4,6 +4,8 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import { getActions } from '../../../modes/';
+import { actions as nodeMcuActions } from '../../../devices/nodemcu-minion.js';
+
 
 class NewAction extends Component {
 	constructor( props, context ) {
@@ -64,7 +66,7 @@ class NewAction extends Component {
 			<RaisedButton label="Submit" primary={ true } onTouchTap={ this.newAction.bind( this ) } disabled={ ! this.state.action || ! this.state.device } />
 		];
 		if ( this.state.device ) {
-			const actionsObject = getActions( this.state.device.mode );
+			const actionsObject = Object.assign( {}, nodeMcuActions, getActions( this.state.device.mode ) );
 			actions = Object.keys( actionsObject ).map( key => Object.assign( { id: key }, actionsObject[ key ] ) );
 		}
 
