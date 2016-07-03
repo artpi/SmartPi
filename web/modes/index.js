@@ -3,6 +3,7 @@ import get from 'lodash/get';
 
 import RGBControl, { Avatar as RGBAvatar, deviceActions as rgbActions } from '../modes/rgb-control.js';
 import Switch, { Avatar as SwitchAvatar, deviceActions as switchActions } from '../modes/switch.js';
+import { actions as nodemcuActions } from '../devices/nodemcu-minion.js';
 
 const modeMapping = {
 	rgb: { edit: RGBControl, avatar: RGBAvatar, actions: rgbActions },
@@ -14,8 +15,8 @@ export function getModeComponent( mode ) {
 }
 
 export default ( props ) => {
-	//const ModeComponent = getModeComponent( props.mode );
-	const ModeComponent = modeMapping[ props.mode ].actions[ props.action ].component;
+	console.log( props.state );
+	const ModeComponent = ( modeMapping[ props.mode ].actions[ props.action ] || nodemcuActions[ props.action ] ).component;
 	if ( !ModeComponent ) {
 		return null;
 	} else {

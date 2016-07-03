@@ -15,9 +15,9 @@ class TriggerEdit extends Component {
 		this.dbTriggerActionsEvent = null;
 	}
 
-	updateAction( id, props ) {
-		console.log( 'updating action ' + id + 'with ', props.state );
-		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( id ).update( props );
+	updateAction( id, newState ) {
+		console.log( 'updating action ' + id + 'with ', newState );
+		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( id ).update( newState );
 	}
 
 	deleteAction( id ) {
@@ -50,6 +50,7 @@ class TriggerEdit extends Component {
 	}
 
 	render() {
+		console.log( this.state.actions );
 		return ( <div>
 			<Card key={ this.props.triggerName } >
 				<CardHeader title={ 'Editing trigger ' + this.props.triggerName } />
@@ -71,15 +72,15 @@ class TriggerEdit extends Component {
 					id={ item.id }
 					action={ item.action }
 					mode={ item.mode }
-					duration={ item.duration || null }
+					rawAction={ item }
 					state={ item.state || null }
-					dispatch={ ( props ) => {
-						this.updateAction( item.key, props );
+					dispatch={ newState => {
+						this.updateAction( item.key, newState );
 					} }
 					delete={ ( ) => this.deleteAction( item.key ) }
 				/>
 			) }
-			<FloatingActionButton onTouchEnd={ ( ) => this.setState( { newAction: {} } ) } style={ {
+			<FloatingActionButton onTouchEnd={ ( ) => this.setState( { newAction: true } ) } style={ {
 				margin: '30px',
 				position: 'absolute',
 				right: '0px'

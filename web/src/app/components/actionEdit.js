@@ -28,7 +28,7 @@ class ActionEdit extends Component {
 					avatar={ <Avatar { ...pick( this.props, [ 'state', 'mode' ] ) }>{ this.props.index }</Avatar> }
 				/ >
 				<CardText expandable={ true }>
-					<ModeEditor { ...pick( this.props, [ 'state', 'mode', 'action', 'dispatch' ] ) } fetching={ false } />
+					<ModeEditor { ...pick( this.props, [ 'state', 'mode', 'action', 'dispatch', 'rawAction' ] ) } fetching={ false } />
 				</CardText>
 				<br/>
 				<CardActions expandable={ true }>

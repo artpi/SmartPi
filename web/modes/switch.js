@@ -21,7 +21,7 @@ class Switch extends Component {
 				toggled={ this.props.state && !! this.props.state.power }
 				disabled={ this.props.fetching }
 				label={ "Turn it on" }
-				onToggle = { ( e, val ) => this.props.dispatch( { power: val ? 1 : 0 } ) }
+				onToggle = { ( e, val ) => this.props.dispatch( { state: { power: val ? 1 : 0 } } ) }
 			/>
 		</div> );
 	}

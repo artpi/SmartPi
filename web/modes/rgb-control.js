@@ -65,12 +65,14 @@ class RGBControl extends Component {
 
 	submit( color ) {
 		this.props.dispatch( {
-			red: Math.round( color.rgb.r * 4 ),
-			green: Math.round( color.rgb.g * 4 ),
-			blue: Math.round( color.rgb.b * 4 )
+			state: {
+				red: Math.round( color.rgb.r * 4 ),
+				green: Math.round( color.rgb.g * 4 ),
+				blue: Math.round( color.rgb.b * 4 )
+			}
 		} );
-	}   
-    
+	}
+
 	render() {
 		var red = get( this.props, [ 'state', 'red' ], '' );
 		var green = get( this.props, [ 'state', 'green' ], '' );
@@ -90,7 +92,7 @@ class RGBControl extends Component {
 
 const GradientControl = props => <div>
 	<TextField
-		defaultValue={ props.state.duration }
+		defaultValue={ props.rawAction.duration }
 		floatingLabelText="Duration (ms)"
 		floatingLabelFixed={ true }
 		onChange={ ( e, val ) => {

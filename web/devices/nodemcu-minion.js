@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import pick from 'lodash/pick';
 import some from 'lodash/some';
 import { Card, CardHeader, CardText, CardActions } from 'material-ui/Card';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -9,6 +8,7 @@ import { red500, cyan200 } from 'material-ui/styles/colors';
 import deepEqual from 'deep-equal';
 import Snackbar from 'material-ui/Snackbar';
 import Mode from '../modes';
+import TextField from 'material-ui/TextField';
 
 const styles = {
 	chip: { margin: '0 5px 0 5px' }
@@ -33,13 +33,15 @@ class NodemcuMinion extends Component {
 		}
 	}
 
-	dispatch( state ) {
+	dispatch( action ) {
+		console.log(action);
 		this.setState( { fetching: true } );
-		this.props.dispatch( {
-			id: this.props.id,
-			action: 'set',
-			state: pick( state, [ 'red', 'green', 'blue', 'power' ] )
-		} );
+		this.props.dispatch(
+			Object.assign( {
+				id: this.props.id,
+				action: 'set'
+			}, action )
+		);
 	}
 
 	off() {
@@ -85,6 +87,7 @@ class NodemcuMinion extends Component {
 					dispatch={ this.dispatch.bind( this ) }
 					fetching = { this.state.fetching }
 					state={ this.props.state }
+					action="set"
 				/>
 				<CardActions style={ { display: 'flex', justifyContent: 'flex-end' } }>
 					<RaisedButton icon={ <IconOff /> } primary={ true } label="OFF" onClick={ () => this.off() } />
@@ -94,5 +97,27 @@ class NodemcuMinion extends Component {
 		);
 	}
 }
+
+const WaitControl = props => <TextField
+	defaultValue={ props.rawAction.duration }
+	floatingLabelText="Duration (ms)"
+	floatingLabelFixed={ true }
+	onChange={ ( e, val ) => {
+		if ( val && val !== '' ) {
+			props.dispatch( { duration: val } );
+		}
+	} }
+/>;
+
+export const actions = {
+	off: {
+		name: 'OFF',
+		component: 'SPAN'
+	},
+	wait: {
+		name: 'Wait',
+		component: WaitControl
+	}
+};
 
 export default NodemcuMinion;
