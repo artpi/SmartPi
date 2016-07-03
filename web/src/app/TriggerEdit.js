@@ -12,7 +12,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 class TriggerEdit extends Component {
 	constructor( props, context ) {
 		super( props, context );
-		this.state = { actions: {}, id: '' };
+		this.state = { actions: [], id: '' };
 		this.dbTriggerActions = this.props.db.ref( 'triggers' ).child( this.props.triggerName ).child( 'actions' );
 		this.dbTriggerActionsEvent = null;
 	}
@@ -20,21 +20,6 @@ class TriggerEdit extends Component {
 	updateAction( id, props ) {
 		console.log( 'updating action ' + id + 'with ', props.state );
 		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( id ).update( props );
-	}
-
-	updateActionId( oldId, newId ) {
-		var oldRef = this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions/' + oldId ),
-			newRef = this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions/' + newId );
-
-		oldRef.once( 'value', function( snap ) {
-			newRef.set( snap.val(), function( error ) {
-				if ( ! error ) {
-					oldRef.remove();
-				} else {
-					console.error( error );
-				}
-			} );
-		} );
 	}
 
 	newAction( type, id = 'smart-pi/13554337' ) {
@@ -67,7 +52,7 @@ class TriggerEdit extends Component {
 				console.log( 'Unknown action type' );
 				return;
 		}
-		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).child( index ).set( action );
+		this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' ).push( action );
 		this.setState( { newAction: false } );
 	}
 
@@ -77,12 +62,12 @@ class TriggerEdit extends Component {
 
 	componentDidMount() {
 		const dbPromises = [];
-		const actions = {};
-
 		this.dbTriggerActionsEvent = this.dbTriggerActions.on( 'value', triggerActions => {
+			const actions = [];
 			triggerActions.forEach( actionShapshot => {
 				const action = actionShapshot.val();
-				actions[ actionShapshot.key ] = action;
+				action.key = actionShapshot.key;
+				actions.push( action );
 				dbPromises.push(
 					this.props.db.ref( 'things/' + action.id )
 					.child( 'mode' )
@@ -107,7 +92,6 @@ class TriggerEdit extends Component {
 				this.newAction( this.state.newActionType );
 			} } />
 		];
-
 		return ( <div>
 				<Card key={ this.props.triggerName } >
 					<CardHeader
@@ -135,9 +119,10 @@ class TriggerEdit extends Component {
 					</SelectField>
 				</Dialog>
 
-			{ Object.keys( this.state.actions ).map( ( index, nvm, keys, item = this.state.actions[ index ] ) =>
+			{ this.state.actions
+				.map( ( item, index ) =>
 				<ActionEdit
-					key={ index }
+					key={ item.key }
 					index={ index }
 					id={ item.id }
 					action={ item.action }
@@ -145,9 +130,9 @@ class TriggerEdit extends Component {
 					duration={ item.duration || null }
 					state={ item.state || null }
 					dispatch={ ( props ) => {
-						this.updateAction( index, props );
+						this.updateAction( item.key, props );
 					} }
-					delete={ ( ) => this.deleteAction( index ) }
+					delete={ ( ) => this.deleteAction( item.key ) }
 				/>
 			) }
 			<FloatingActionButton onTouchEnd={ ( ) => this.setState( { newAction: {} } ) } style={ {
