@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardText, CardHeader, CardActions } from 'material-ui/Card';
 import ModeEditor, { Avatar } from '../../../modes';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ActionDelete from 'material-ui/svg-icons/action/highlight-off';
 import pick from 'lodash/pick';
@@ -43,8 +43,9 @@ class ActionEdit extends Component {
 					}
 					<ModeEditor mode={ this.props.mode } fetching={ false } dispatch={ ( color ) => this.props.dispatch( { state: color } ) } state={ this.props.state } />
 				</CardText>
+				<br/>
 				<CardActions expandable={ true }>
-					<FlatButton style={ deleteIcon } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />
+					<RaisedButton style={ deleteIcon } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />
 				</CardActions>
 			</Card>
 			);
