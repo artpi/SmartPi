@@ -4,7 +4,7 @@ import AvatarComponent from 'material-ui/Avatar';
 import On from 'material-ui/svg-icons/file/cloud-done';
 import Off from 'material-ui/svg-icons/file/cloud-off';
 
-export const Avatar = props => <AvatarComponent icon={ props.power ? <On /> : <Off /> }></AvatarComponent>;
+export const Avatar = props => <AvatarComponent icon={ props.state.power ? <On /> : <Off /> } style={ { marginRight: '10px' } }></AvatarComponent>;
 
 class Switch extends Component {
 	constructor( props, context ) {

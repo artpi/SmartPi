@@ -34,9 +34,9 @@ class TriggerEdit extends Component {
 				actions.push( action );
 				dbPromises.push(
 					this.props.db.ref( 'things/' + action.id )
-					.child( 'mode' )
 					.once( 'value', snapshot => {
-						action.mode = snapshot.val();
+						action.mode = snapshot.val().mode;
+						action.device = snapshot.val();
 					} )
 				);
 			} );
@@ -71,6 +71,7 @@ class TriggerEdit extends Component {
 					id={ item.id }
 					action={ item.action }
 					mode={ item.mode }
+					device={ item.device }
 					rawAction={ item }
 					state={ item.state || null }
 					dispatch={ newState => {

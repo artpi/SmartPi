@@ -6,7 +6,7 @@ import Color from '../utils/color';
 import AvatarComponent from 'material-ui/Avatar';
 import TextField from 'material-ui/TextField';
 
-export const Avatar = props => <AvatarComponent backgroundColor={ props.state ? Color( props.state ) : null }>{ props.children }</AvatarComponent>;
+export const Avatar = props => <AvatarComponent backgroundColor={ props.state ? Color( props.state ) : null } style={ { marginRight: '10px' } }>{ props.children }</AvatarComponent>;
 
 
 const WrappedPicker = CustomPicker( props => (

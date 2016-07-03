@@ -7,32 +7,21 @@ import pick from 'lodash/pick';
 
 class ActionEdit extends Component {
 	render() {
-		var deleteIcon = {
-				position: 'absolute',
-				right: 0,
-				bottom: 18
-			},
-			title = this.props.action;
-
-		if ( this.props.duration ) {
-			title += ' for ' + this.props.duration / 1000 + ' seconds';
-		}
-		title += ' on ' + this.props.id;
-
 		return (
 			<Card key={ this.props.index } style={ { marginTop: '20px' } } >
 				<CardHeader
-					title={ title }
+					title = { '#' + ( this.props.index + 1 ) + ' ' + this.props.action }
+					subtitle={ this.props.device.name || this.props.device.id }
 					actAsExpander={ true }
 					showExpandableButton={ true }
-					avatar={ <Avatar { ...pick( this.props, [ 'state', 'mode' ] ) }>{ this.props.index }</Avatar> }
+					avatar={ <Avatar { ...pick( this.props, [ 'state', 'mode' ] ) }></Avatar> }
 				/ >
 				<CardText expandable={ true }>
 					<ModeEditor { ...pick( this.props, [ 'state', 'mode', 'action', 'dispatch', 'rawAction' ] ) } fetching={ false } />
 				</CardText>
 				<br/>
 				<CardActions expandable={ true }>
-					<RaisedButton style={ deleteIcon } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />
+					<RaisedButton style={ { position: 'absolute', right: 0, bottom: 18 } } label='Delete' onTouchTap={ this.props.delete } icon={ <ActionDelete /> } />
 				</CardActions>
 			</Card>
 			);
