@@ -4,6 +4,7 @@ import { CustomPicker } from 'react-color';
 import Slider from 'material-ui/Slider';
 import Color from '../utils/color';
 import AvatarComponent from 'material-ui/Avatar';
+import TextField from 'material-ui/TextField';
 
 export const Avatar = props => <AvatarComponent backgroundColor={ props.state ? Color( props.state ) : null }>{ props.children }</AvatarComponent>;
 
@@ -87,9 +88,23 @@ class RGBControl extends Component {
 	}
 }
 
+const GradientControl = props => <div>
+	<TextField
+		defaultValue={ props.state.duration }
+		floatingLabelText="Duration (ms)"
+		floatingLabelFixed={ true }
+		onChange={ ( e, val ) => {
+			if ( val && val !== '' ) {
+				props.dispatch( { duration: val } );
+			}
+		} }
+	/>
+	<RGBControl {...props} />
+</div>;
+
 export const deviceActions = {
 	set: { 'name': 'Set Color', component: RGBControl },
-	gradient: { 'name': 'Color Transition', component: null },
+	gradient: { 'name': 'Color Transition', component: GradientControl },
 };
 
 export default RGBControl;

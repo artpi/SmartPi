@@ -14,7 +14,8 @@ export function getModeComponent( mode ) {
 }
 
 export default ( props ) => {
-	const ModeComponent = getModeComponent( props.mode );
+	//const ModeComponent = getModeComponent( props.mode );
+	const ModeComponent = modeMapping[ props.mode ].actions[ props.action ].component;
 	if ( !ModeComponent ) {
 		return null;
 	} else {
