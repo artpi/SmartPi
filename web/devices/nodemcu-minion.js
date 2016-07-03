@@ -34,7 +34,6 @@ class NodemcuMinion extends Component {
 	}
 
 	dispatch( action ) {
-		console.log(action);
 		this.setState( { fetching: true } );
 		this.props.dispatch(
 			Object.assign( {
