@@ -2,7 +2,7 @@
 
 A SmartHome setup using Google Firebase and $4 modules. Can do a lot of awesome stuff.
 
-## [![](https://cloud.githubusercontent.com/assets/3775068/16554631/6191bf76-41d0-11e6-9656-615122231014.png)  Play demo video on youtube](https://www.youtube.com/watch?v=AjtrikwHB_Y)
+## [📺 Play demo video on youtube 🎦](https://www.youtube.com/watch?v=AjtrikwHB_Y)
 
 
 | Devices list                        | Main menu                           | RGB lamp control                    | Composing triggers                  |
