@@ -1,0 +1,17 @@
+{
+  "name": "homebridge-firenet",
+  "version": "0.0.1",
+  "description": "Firenet of Thing platform for HomeBridge",
+  "license": "GPLv3",
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/artpi/SmartPi.git"
+  },
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  }
+}
