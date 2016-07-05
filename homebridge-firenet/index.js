@@ -1,5 +1,10 @@
-var http = require('http');
+var firebase = require('firebase');
 var Accessory, Service, Characteristic, UUIDGen;
+
+firebase.initializeApp( {
+	serviceAccount: require( 'config-firebaseKeys.json' ),
+	databaseURL: 'https://ioartpi.firebaseio.com',
+} );
 
 module.exports= function(homebridge) {
 	console.log("homebridge API version: " + homebridge.version);
@@ -21,34 +26,66 @@ module.exports= function(homebridge) {
 // config may be null
 // api may be null if launched from old homebridge version
 function FirenetPlatform(log, config, api) {
+	var platform = this;
 	console.log("FirenetPlatform Init");
 	this.log = log;
 	this.config = config;
 	this.accessories = [];
 
-	this.requestServer = http.createServer(function(request, response) {
-		if (request.url === "/add") {
-			this.addAccessory();
-			response.writeHead(204);
-			response.end();
+	firebase.database().ref( 'things' )
+	.child( 'smart-pi' )
+	.on( 'child_added', function( deviceSnap ) {
+		var data = deviceSnap.val();
+		var newAccessory = new Accessory( data.name || deviceSnap.key, UUIDGen.generate( deviceSnap.key ) );
+		newAccessory.on( 'identify', function( paired, callback ) {
+			console.log( "Identify!!!" );
+			callback();
+		});
+		if( data.mode === 'switch' ) {
+			newAccessory.addService( Service.Lightbulb, "Light" )
+			.getCharacteristic( Characteristic.On )
+			.on( 'set', function( value, callback ) {
+				firebase.database().ref( 'dispatch' ).push( {
+					'id': 'smart-pi/' + deviceSnap.key,
+					'action': 'set',
+					'state' : {
+						'power' : value ? 1 : 0
+					}
+				} );
+				callback();
+			});
+			platform.accessories.push( newAccessory );
+			platform.api.registerPlatformAccessories("homebridge-firenetPlatform", "FirenetPlatform", [ newAccessory ] );
 		}
+	} );
 
-		if (request.url == "/reachability") {
-			this.updateAccessoriesReachability();
-			response.writeHead(204);
-			response.end();
-		}
 
-		if (request.url == "/remove") {
-			this.removeAccessory();
-			response.writeHead(204);
-			response.end();
-		}
-	}.bind(this));
 
-	this.requestServer.listen(18081, function() {
-		console.log("Server Listening...");
-	});
+
+
+	// this.requestServer = http.createServer(function(request, response) {
+	// 	if (request.url === "/add") {
+	// 		this.addAccessory();
+	// 		response.writeHead(204);
+	// 		response.end();
+	// 	}
+
+	// 	if (request.url == "/reachability") {
+	// 		this.updateAccessoriesReachability();
+	// 		response.writeHead(204);
+	// 		response.end();
+	// 	}
+
+	// 	if (request.url == "/remove") {
+	// 		this.removeAccessory();
+	// 		response.writeHead(204);
+	// 		response.end();
+	// 	}
+	// }.bind(this));
+
+	// this.requestServer.listen(18081, function() {
+	// 	console.log("Server Listening...");
+	// });
 
 	if (api) {
 			// Save the API object as plugin needs to register new accessory via this object.

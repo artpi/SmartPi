@@ -1,17 +1,27 @@
 {
-  "name": "homebridge-firenet",
-  "version": "0.0.1",
-  "description": "Firenet of Thing platform for HomeBridge",
-  "license": "GPLv3",
-  "keywords": [
-    "homebridge-plugin"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/artpi/SmartPi.git"
-  },
-  "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
-  }
+	"name": "homebridge-firenet",
+	"version": "0.0.1",
+	"description": "Firenet of Thing platform for HomeBridge",
+	"license": "GPLv3",
+	"keywords": [
+		"homebridge-plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/artpi/SmartPi.git"
+	},
+	"engines": {
+		"node": ">=0.12.0",
+		"homebridge": ">=0.2.0"
+	},
+	"dependencies": {
+	    "firebase": "^3.0.5",
+	    "lodash": "^4.13.1"
+	},
+	"devDependencies": {
+		"babel-eslint": "6.0.4",
+		"eslint": "1.10.3",
+		"eslint-plugin-react": "3.11.3",
+		"eslint-plugin-wpcalypso": "1.1.3"
+	}
 }
