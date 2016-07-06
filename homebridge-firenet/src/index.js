@@ -8,8 +8,6 @@ if ( ! config ) {
 	throw 'You need to provide config file. Default location is `~/.firenet-of-things/config.json`.';
 }
 
-var Accessory, Service, Characteristic, UUIDGen;
-
 if ( ! config.firebase ) {
 	throw 'You need to put Firebase database url in `firebase` key in  `config.json`';
 }
@@ -19,24 +17,18 @@ firebase.initializeApp( {
 	databaseURL: config.firebase,
 } );
 
-module.exports= function(homebridge) {
-	console.log("homebridge API version: " + homebridge.version);
+let Accessory, Service, Characteristic, UUIDGen;
 
-	// Accessory must be created from PlatformAccessory Constructor
+module.exports = function( homebridge ) {
+	console.log( 'homebridge API version: ' + homebridge.version );
+
 	Accessory = homebridge.platformAccessory;
-
-	// Service and Characteristic are from hap-nodejs
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
 	UUIDGen = homebridge.hap.uuid;
-	// For platform plugin to be considered as dynamic platform plugin,
-	// registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-	homebridge.registerPlatform("homebridge-firenetPlatform", "FirenetPlatform", FirenetPlatform, true);
-};
+	homebridge.registerPlatform( 'homebridge-firenetPlatform', 'FirenetPlatform', FirenetPlatform, true );
+}
 
-// Platform constructor
-// config may be null
-// api may be null if launched from old homebridge version
 function FirenetPlatform( log, config, api ) {
 	var platform = this;
 	console.log( 'FirenetPlatform Init' );
@@ -67,18 +59,15 @@ function FirenetPlatform( log, config, api ) {
 	}
 }
 
-// Function invoked when homebridge tries to restore cached accessory
-// Developer can configure accessory at here (like setup event handler)
-// Update current value
 FirenetPlatform.prototype.configureAccessory = function( accessory ) {
-	console.log( "Plugin - Configure Accessory: " + accessory.displayName );
-	// set the accessory to reachable if plugin can currently process the accessory
-	// otherwise set to false and update the reachability later by invoking 
-	// accessory.updateReachability()
-	accessory.reachable = true;
+	console.log( 'Plugin - Configure Accessory: ' + accessory.displayName );
+	const id = accessory.context.id;
+	const dbRef = firebase.database().ref( 'things/' + id );
 
-	accessory.on( 'identify', function(paired, callback) {
-		console.log( "Identify!!!" );
+	dbRef.child( 'connected' ).on( 'value', snap => accessory.updateReachability( snap.val() === 'true' ) );
+
+	accessory.on( 'identify', function( paired, callback ) {
+		console.log( 'Identify!!!' );
 		callback();
 	} );
 
