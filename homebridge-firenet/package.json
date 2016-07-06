@@ -1,10 +1,14 @@
 {
 	"name": "homebridge-firenet",
 	"version": "0.0.1",
-	"description": "Firenet of Thing platform for HomeBridge",
+	"description": "Firenet of Things platform for HomeBridge",
 	"license": "GPLv3",
 	"keywords": [
-		"homebridge-plugin"
+		"homebridge-plugin",
+		"firenet",
+		"firenet-of-things"
+		"smartpi",
+		"smarthome"
 	],
 	"repository": {
 		"type": "git",
