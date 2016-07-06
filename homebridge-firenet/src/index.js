@@ -27,7 +27,7 @@ module.exports = function( homebridge ) {
 	Characteristic = homebridge.hap.Characteristic;
 	UUIDGen = homebridge.hap.uuid;
 	homebridge.registerPlatform( 'homebridge-firenetPlatform', 'FirenetPlatform', FirenetPlatform, true );
-}
+};
 
 function FirenetPlatform( log, config, api ) {
 	var platform = this;
@@ -73,9 +73,12 @@ FirenetPlatform.prototype.configureAccessory = function( accessory ) {
 	} );
 
 	if ( accessory.getService( Service.Lightbulb ) ) {
-		accessory.getService( Service.Lightbulb )
-		.getCharacteristic( Characteristic.On )
-		.on( 'set', function( value, callback ) {
+		const characteristic = accessory
+		.getService( Service.Lightbulb )
+		.getCharacteristic( Characteristic.On );
+
+		//Update state on server
+		characteristic.on( 'set', function( value, callback ) {
 			firebase.database().ref( 'dispatch' ).push( {
 				'id': accessory.context.id,
 				'action': 'set',
@@ -85,6 +88,10 @@ FirenetPlatform.prototype.configureAccessory = function( accessory ) {
 			} );
 			callback();
 		} );
+
+		//Update state in homebridge
+		dbRef.child( 'state' ).child( 'power' )
+		.on( 'value', snap => characteristic.setValue( snap.val() === 1 ) );
 	}
 
 	this.accessories.push( accessory );
