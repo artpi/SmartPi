@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import os from 'os';
+import some from 'lodash/some';
 
 const configFolder = os.homedir() + '/.firenet-of-things';
 const config = require( configFolder + '/' + 'config.json' );
@@ -28,7 +29,6 @@ module.exports= function(homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
 	UUIDGen = homebridge.hap.uuid;
-	
 	// For platform plugin to be considered as dynamic platform plugin,
 	// registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
 	homebridge.registerPlatform("homebridge-firenetPlatform", "FirenetPlatform", FirenetPlatform, true);
@@ -37,108 +37,68 @@ module.exports= function(homebridge) {
 // Platform constructor
 // config may be null
 // api may be null if launched from old homebridge version
-function FirenetPlatform(log, config, api) {
+function FirenetPlatform( log, config, api ) {
 	var platform = this;
-	console.log("FirenetPlatform Init");
+	console.log( 'FirenetPlatform Init' );
 	this.log = log;
 	this.config = config;
 	this.accessories = [];
 
-	firebase.database().ref( 'things' )
-	.child( 'smart-pi' )
-	.on( 'child_added', function( deviceSnap ) {
-		var data = deviceSnap.val();
-		var newAccessory = new Accessory( data.name || deviceSnap.key, UUIDGen.generate( deviceSnap.key ) );
-		newAccessory.on( 'identify', function( paired, callback ) {
-			console.log( "Identify!!!" );
-			callback();
-		});
-		if( data.mode === 'switch' ) {
-			newAccessory.addService( Service.Lightbulb, "Light" )
-			.getCharacteristic( Characteristic.On )
-			.on( 'set', function( value, callback ) {
-				firebase.database().ref( 'dispatch' ).push( {
-					'id': 'smart-pi/' + deviceSnap.key,
-					'action': 'set',
-					'state' : {
-						'power' : value ? 1 : 0
+	if ( api ) {
+		this.api = api;
+		this.api.on( 'didFinishLaunching', function() {
+			console.log( 'Plugin - DidFinishLaunching' );
+			firebase.database().ref( 'things' )
+			.child( 'smart-pi' )
+			.on( 'child_added', function( deviceSnap ) {
+				const data = deviceSnap.val();
+				const id = 'smart-pi/' + deviceSnap.key;
+				if ( ! some( platform.accessories, accessory => accessory.context.id === id ) ) {
+					const newAccessory = new Accessory( data.name || id, UUIDGen.generate( id ) );
+					newAccessory.context.id = id;
+					if ( data.mode === 'switch' ) {
+						newAccessory.addService( Service.Lightbulb, 'Light' );
+						platform.configureAccessory( newAccessory );
+						platform.api.registerPlatformAccessories( 'homebridge-firenetPlatform', 'FirenetPlatform', [ newAccessory ] );
 					}
-				} );
-				callback();
-			});
-			platform.accessories.push( newAccessory );
-			platform.api.registerPlatformAccessories("homebridge-firenetPlatform", "FirenetPlatform", [ newAccessory ] );
-		}
-	} );
-
-
-
-
-
-	// this.requestServer = http.createServer(function(request, response) {
-	// 	if (request.url === "/add") {
-	// 		this.addAccessory();
-	// 		response.writeHead(204);
-	// 		response.end();
-	// 	}
-
-	// 	if (request.url == "/reachability") {
-	// 		this.updateAccessoriesReachability();
-	// 		response.writeHead(204);
-	// 		response.end();
-	// 	}
-
-	// 	if (request.url == "/remove") {
-	// 		this.removeAccessory();
-	// 		response.writeHead(204);
-	// 		response.end();
-	// 	}
-	// }.bind(this));
-
-	// this.requestServer.listen(18081, function() {
-	// 	console.log("Server Listening...");
-	// });
-
-	if (api) {
-			// Save the API object as plugin needs to register new accessory via this object.
-			this.api = api;
-
-			// Listen to event "didFinishLaunching", this means homebridge already finished loading cached accessories
-			// Platform Plugin should only register new accessory that doesn't exist in homebridge after this event.
-			// Or start discover new accessories
-			this.api.on('didFinishLaunching', function() {
-				console.log("Plugin - DidFinishLaunching");
-			}.bind(this));
+				}
+			} );
+		}.bind( this ) );
 	}
 }
 
 // Function invoked when homebridge tries to restore cached accessory
 // Developer can configure accessory at here (like setup event handler)
 // Update current value
-FirenetPlatform.prototype.configureAccessory = function(accessory) {
-	console.log("Plugin - Configure Accessory: " + accessory.displayName);
-
+FirenetPlatform.prototype.configureAccessory = function( accessory ) {
+	console.log( "Plugin - Configure Accessory: " + accessory.displayName );
 	// set the accessory to reachable if plugin can currently process the accessory
 	// otherwise set to false and update the reachability later by invoking 
 	// accessory.updateReachability()
 	accessory.reachable = true;
 
-	accessory.on('identify', function(paired, callback) {
-		console.log("Identify!!!");
+	accessory.on( 'identify', function(paired, callback) {
+		console.log( "Identify!!!" );
 		callback();
-	});
+	} );
 
-	if (accessory.getService(Service.Lightbulb)) {
-		accessory.getService(Service.Lightbulb)
-		.getCharacteristic(Characteristic.On)
-		.on('set', function(value, callback) {
-			console.log("Light -> " + value);
+	if ( accessory.getService( Service.Lightbulb ) ) {
+		accessory.getService( Service.Lightbulb )
+		.getCharacteristic( Characteristic.On )
+		.on( 'set', function( value, callback ) {
+			firebase.database().ref( 'dispatch' ).push( {
+				'id': accessory.context.id,
+				'action': 'set',
+				'state' : {
+					'power' : value ? 1 : 0
+				}
+			} );
 			callback();
-		});
+		} );
 	}
 
-	this.accessories.push(accessory);
-}
+	this.accessories.push( accessory );
+};
 
 //Handler will be invoked when user try to config your plugin
 //Callback can be cached and invoke when nessary
@@ -247,12 +207,12 @@ FirenetPlatform.prototype.addAccessory = function(accessoryName) {
 		callback();
 	});
 
-	this.accessories.push(newAccessory);
-	this.api.registerPlatformAccessories("homebridge-firenetPlatform", "FirenetPlatform", [newAccessory]);
+	this.accessories.push( newAccessory );
+	this.api.registerPlatformAccessories( "homebridge-firenetPlatform", "FirenetPlatform", [ newAccessory ] );
 }
 
 FirenetPlatform.prototype.updateAccessoriesReachability = function() {
-	console.log("Update Reachability");
+	console.log( "Update Reachability" );
 	for (var index in this.accessories) {
 		var accessory = this.accessories[index];
 		accessory.updateReachability(false);
