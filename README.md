@@ -32,10 +32,10 @@ A SmartHome setup using Google Firebase and $4 modules. Can do a lot of awesome 
 1. You need devices that communicate with this project. I recommend [nodemcu-minion with ESP8266](https://github.com/artpi/nodemcu-minion)
 2. Install mqtt broker on your device at home ( Raspberry Pi? ). `apt-get install mosquitto`
 3. [Sign up for a free Google Firebase account](https://firebase.google.com/)
-4. Download server account keys for firebase and save them as `device-bridge/config-firebaseKeys.json`
-5. Edit `device-bridge/config.js` with your config:
+4. Download service account keys for firebase and save them as `~/.firenet-of-things/firebase-credentials.json`
+5. Edit `~/.firenet-of-things/config.js` with your config:
 ```
-export default {
+{
 	id: 'smart-pi',
 	broker: 'mqtt://...',
 	firebase: 'https://....firebaseio.com'
