@@ -72,27 +72,29 @@ FirenetPlatform.prototype.configureAccessory = function( accessory ) {
 		callback();
 	} );
 
-	if ( accessory.getService( Service.Lightbulb ) ) {
-		const characteristic = accessory
-		.getService( Service.Lightbulb )
-		.getCharacteristic( Characteristic.On );
+	dbRef.child( 'mode' ).once( 'value', modeSnap => {
+		if ( modeSnap.val() === 'switch' && accessory.getService( Service.Lightbulb ) ) {
+			const characteristic = accessory
+			.getService( Service.Lightbulb )
+			.getCharacteristic( Characteristic.On );
 
-		//Update state on server
-		characteristic.on( 'set', function( value, callback ) {
-			firebase.database().ref( 'dispatch' ).push( {
-				'id': accessory.context.id,
-				'action': 'set',
-				'state' : {
-					'power' : value ? 1 : 0
-				}
+			//Update state on server
+			characteristic.on( 'set', function( value, callback ) {
+				firebase.database().ref( 'dispatch' ).push( {
+					'id': accessory.context.id,
+					'action': 'set',
+					'state' : {
+						'power' : value ? 1 : 0
+					}
+				} );
+				callback();
 			} );
-			callback();
-		} );
 
-		//Update state in homebridge
-		dbRef.child( 'state' ).child( 'power' )
-		.on( 'value', snap => characteristic.setValue( snap.val() === 1 ) );
-	}
+			//Update state in homebridge
+			dbRef.child( 'state' ).child( 'power' )
+			.on( 'value', snap => characteristic.value = ( snap.val() === 1 ) );
+		}
+	} );
 
 	this.accessories.push( accessory );
 
