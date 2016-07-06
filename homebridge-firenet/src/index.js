@@ -1,9 +1,21 @@
-var firebase = require('firebase');
+import firebase from 'firebase';
+import os from 'os';
+
+const configFolder = os.homedir() + '/.firenet-of-things';
+const config = require( configFolder + '/' + 'config.json' );
+if ( ! config ) {
+	throw 'You need to provide config file. Default location is `~/.firenet-of-things/config.json`.';
+}
+
 var Accessory, Service, Characteristic, UUIDGen;
 
+if ( ! config.firebase ) {
+	throw 'You need to put Firebase database url in `firebase` key in  `config.json`';
+}
+
 firebase.initializeApp( {
-	serviceAccount: require( 'config-firebaseKeys.json' ),
-	databaseURL: 'https://ioartpi.firebaseio.com',
+	serviceAccount: configFolder + '/' + 'firebase-credentials.json',
+	databaseURL: config.firebase,
 } );
 
 module.exports= function(homebridge) {

@@ -1,15 +1,29 @@
 import mqtt from 'mqtt';
 import firebase from 'firebase';
+import os from 'os';
 
-import config from './config.js';
 import NodemcuMinion from './devices/nodemcu-minion.js';
 import { createMainWorker } from './firebaseConnection.js';
 
+const configFolder = os.homedir() + '/.firenet-of-things';
+const config = require( configFolder + '/' + 'config.json' );
+
+if ( ! config ) {
+	throw 'You need to provide config file. Default location is `~/.firenet-of-things/config.json`.';
+}
+
+if ( ! config.broker ) {
+	throw 'You need to put MQTT url in `broker` key in  `config.json`';
+}
 const client = mqtt.connect( config.broker );
 const devices = {};
 
+if ( ! config.firebase ) {
+	throw 'You need to put Firebase database url in `firebase` key in  `config.json`';
+}
+
 firebase.initializeApp( {
-	serviceAccount: './config-firebaseKeys.json',
+	serviceAccount: configFolder + '/' + 'firebase-credentials.json',
 	databaseURL: config.firebase,
 } );
 
