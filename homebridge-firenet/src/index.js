@@ -64,6 +64,7 @@ FirenetPlatform.prototype.configureAccessory = function( accessory ) {
 	const id = accessory.context.id;
 	const dbRef = firebase.database().ref( 'things/' + id );
 
+	//This is not working as it supposed to
 	dbRef.child( 'connected' ).on( 'value', snap => accessory.updateReachability( snap.val() === 'true' ) );
 
 	accessory.on( 'identify', function( paired, callback ) {
