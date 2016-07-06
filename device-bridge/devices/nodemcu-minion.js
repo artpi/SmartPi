@@ -36,13 +36,14 @@ NodemcuMinion.prototype.heartbeat = function( heartbeat ) {
 NodemcuMinion.prototype.disconnect = function() {
 	this.connected = false;
 	return Promise.all( [
-		this.firebase.child( 'connected' ).set( this.connected ),
+		this.firebase.child( 'connected' ).set( false ),
 		this.queue.shutdown()
 	] );
 };
 
 NodemcuMinion.prototype.connectQueue = function() {
 	this.connected = true;
+	this.firebase.child( 'connected' ).set( this.connected );
 	this.queue = createGatewayWorker( this.firebaseRoot, this.id, this.processQueueTask.bind( this ) );
 };
 
