@@ -17,11 +17,15 @@ class NewAction extends Component {
 
 	newAction() {
 		if ( this.state.action && this.state.device ) {
-			const dbRef = this.props.db.ref( 'triggers/' + this.props.triggerName + '/actions' );
-			dbRef.orderByChild( 'order' ).limitToLast( 1 ).once( 'child_added' )
+			const dbRef = this.props.db.ref( 'triggers/' + this.props.triggerName );
+			dbRef.once( 'value' )
+			.then( triggerSnap => triggerSnap.child( 'actions' ).hasChildren()
+				? dbRef.child( 'actions' ).orderByChild( 'order' ).limitToLast( 1 ).once( 'child_added' )
+				: Promise.resolve() //If there are no prev actions, we immmidiately resolve to create a new action
+			)
 			.then( snap => {
-				const order = ( snap.val().order || 1 ) + 1;
-				dbRef.push( { order, action: this.state.action, id: this.state.device.id } );
+				const order = snap ? ( snap.val().order + 1 ) : 1;
+				dbRef.child( 'actions' ).push( { order, action: this.state.action, id: this.state.device.id } );
 			} );
 		}
 		this.props.close();

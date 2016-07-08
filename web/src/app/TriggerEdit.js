@@ -73,14 +73,14 @@ class TriggerEdit extends Component {
 					mode={ item.mode }
 					device={ item.device }
 					rawAction={ item }
-					state={ item.state || null }
+					state={ item.state || {} }
 					dispatch={ newState => {
 						this.updateAction( item.key, newState );
 					} }
 					delete={ ( ) => this.deleteAction( item.key ) }
 				/>
 			) }
-			<FloatingActionButton onTouchEnd={ ( ) => this.setState( { newAction: true } ) } style={ {
+			<FloatingActionButton onTouchTap={ () => this.setState( { newAction: true } ) } style={ {
 				margin: '30px',
 				position: 'absolute',
 				right: '0px'
