@@ -3,5 +3,4 @@ config*
 node_modules
 *.sublime-*
 .firebaserc
-web/build
-homebridge-firenet/build
+build
