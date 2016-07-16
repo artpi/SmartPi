@@ -10,6 +10,10 @@
 	"bin": {
 		"firenet-of-things": "./bin/firenet"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/artpi/SmartPi.git"
+	},
 	"keywords": [
 		"firenet",
 		"firenet-of-things",
