@@ -42,7 +42,7 @@ A SmartHome setup using Google Firebase and $4 modules. Can do a lot of awesome 
 };
 ```
 6. Save config for the [web console from firebase setup](https://firebase.google.com/docs/web/setup) as `web/config-firebase.js`
-7. Run Device Bridge (in your raspberry pi) : `cd device-bridge && npm install && npm run`
+7. Run Device Bridge (in your raspberry pi) : `cd device-bridge && npm install && npm run build && npm start`
 8. Build web interface : `cd web && npm install && npm run build && firebase deploy`
 9. Navigate to your new projet: `firebase open`
 10. Profit
