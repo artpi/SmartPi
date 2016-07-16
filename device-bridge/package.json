@@ -1,7 +1,7 @@
 {
 	"name": "firenet",
 	"version": "0.0.1",
-	"description": "Device Bridge for IOT setup",
+	"description": "Firenet-of-things main device bridge. Connects Firebase with MQTT devices.",
 	"scripts": {
 		"build": "babel ./src --out-dir build",
 		"develop": "babel-node ./src/index.js",
@@ -11,11 +11,11 @@
 		"firenet-of-things": "./bin/firenet"
 	},
 	"keywords": [
-		"homebridge-plugin",
 		"firenet",
 		"firenet-of-things",
 		"smartpi",
-		"smarthome"
+		"smarthome",
+		"iot"
 	],
 	"main": "./build/index.js",
 	"license": "GPL3",
